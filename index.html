@@ -188,7 +188,7 @@
         const socket = io();
         let numbers = [];
         let editingIndex = null;
-        const correctPassword = "admin"; // 管理者パスワード
+        const correctPassword = "admin"; // パスワードをここで先に定義
 
         function getBingoColumnColor(number) {
             if (number >= 1 && number <= 15) return 'B';
