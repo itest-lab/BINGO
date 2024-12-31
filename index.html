@@ -172,7 +172,20 @@
         const socket = io();
         let numbers = [];
         let editingIndex = null;
+        // ページ読み込み時にlocalStorageを確認して、adminモードの表示を切り替える
+        window.onload = function () {
+            const isAdmin = localStorage.getItem('admin') === 'true';
+            if (isAdmin) {
+                document.getElementById('admin-controls').style.display = 'block';
+            }
+        };
 
+        // 管理者モードを設定する関数
+        function setAdminMode(isAdmin) {
+            localStorage.setItem('admin', isAdmin ? 'true' : 'false');
+            document.getElementById('admin-controls').style.display = isAdmin ? 'block' : 'none';
+        }
+        
         function getBingoColumnColor(number) {
             if (number >= 1 && number <= 15) return 'B';
             if (number >= 16 && number <= 30) return 'I';
@@ -255,18 +268,6 @@
         }
 
         socket.on('updateNumbers', updateNumbers);
-        
-        // ページが読み込まれたときにクエリパラメータを取得
-        window.onload = function () {
-            const urlParams = new URLSearchParams(window.location.search);
-            const isAdmin = urlParams.get('admin') === 'true';  // admin=trueの場合、isAdminがtrueになる
-        
-            if (isAdmin) {
-                document.getElementById('admin-controls').style.display = 'block'; // 管理者UIを表示
-            } else {
-                document.getElementById('admin-controls').style.display = 'none'; // 通常UIを表示
-            }
-        };
     </script>
 </body>
 </html>
