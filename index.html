@@ -15,11 +15,6 @@
             align-items: center;
             background-color: #eaeaea;
         }
-        #main-container {
-            display: flex;
-            width: 100%;
-            height: 100%;
-        }
 
         #current-number {
             width: 700px;
@@ -31,23 +26,26 @@
             position: absolute;
             left: 50%;
             top: 50%;
-            transform: translate(-110%, -50%); 
+            transform: translate(-110%, -50%);
             border-radius: 10px;
         }
 
         #past-numbers {
             margin-left: 47%;
             display: grid;
-            grid-template-columns: repeat(10, 1fr); 
+            grid-template-columns: repeat(10, 1fr);
             gap: 10px;
             width: auto;
             height: auto;
             padding: 20px;
             overflow-y: auto;
+            overflow-x: hidden;
+            padding-top: 20px;
+            padding-bottom: 20px;
         }
 
         .number {
-            font-size: 3em; 
+            font-size: 3em;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -57,13 +55,20 @@
             cursor: pointer;
             text-align: center;
             border: 2px solid black;
+            transition: transform 0.2s ease-in-out;
             height: 70px;
             width: 70px;
         }
 
+        .number.B { background-color: #ff9999; }
+        .number.I { background-color: #ffcc99; }
+        .number.N { background-color: #ffff99; }
+        .number.G { background-color: #ccff99; }
+        .number.O { background-color: #99ccff; }
+
         .admin-controls {
             position: fixed;
-            bottom: 20px;
+            bottom: 80px;
             left: 20px;
             z-index: 10;
             display: flex;
@@ -80,6 +85,45 @@
             cursor: pointer;
         }
 
+        .popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            border: 2px solid black;
+            border-radius: 10px;
+            padding: 20px;
+            z-index: 100;
+            display: none;
+            width: 300px;
+        }
+
+        .popup input {
+            display: block;
+            width: 90%;
+            padding: 10px;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        .popup button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 99;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -94,44 +138,70 @@
         <input type="number" id="newNumber" placeholder="数字を入力 (1~75)" autofocus>
         <button onclick="sendNumber()">送信</button>
         <button onclick="resetNumbers()">リセット</button>
-        <button onclick="setAdminMode(false)">管理者モード終了</button>
+    </div>
+
+    <button id="adminButton" onclick="showPasswordPrompt()" style="position: fixed; bottom: 20px; right: 20px; padding: 10px 20px;">管理者モード</button>
+
+    <!-- パスワード入力ポップアップ -->
+    <div class="overlay" id="overlay"></div>
+    <div class="popup" id="popup">
+        <div id="popupContent">
+            <p>パスワードを入力してください:</p>
+            <input type="password" id="passwordInput" placeholder="パスワード">
+            <button onclick="checkPassword()">確定</button>
+            <button onclick="closePopup()">キャンセル</button>
+        </div>
     </div>
 
     <script>
-        const socket = io();
-        let numbers = [];
+        const correctPassword = "admin123";  // 管理者用のパスワード
+        const adminButton = document.getElementById("adminButton");
+        const adminControls = document.getElementById("admin-controls");
+        const popup = document.getElementById("popup");
+        const overlay = document.getElementById("overlay");
 
-        // ページ読み込み時にlocalStorageを確認して、adminモードの表示を切り替える
-        window.onload = function () {
-            const isAdmin = localStorage.getItem('admin') === 'true';
-            if (isAdmin) {
-                document.getElementById('admin-controls').style.display = 'block';
-            }
-        };
-
-        // 管理者モードを設定する関数
-        function setAdminMode(isAdmin) {
-            localStorage.setItem('admin', isAdmin ? 'true' : 'false');
-            document.getElementById('admin-controls').style.display = isAdmin ? 'block' : 'none';
+        // 管理者モードボタンを押したとき
+        function showPasswordPrompt() {
+            overlay.style.display = "block";
+            popup.style.display = "block";
         }
 
+        // パスワードチェック
+        function checkPassword() {
+            const passwordInput = document.getElementById("passwordInput").value;
+            if (passwordInput === correctPassword) {
+                // パスワードが正しい場合、管理者モードに切り替える
+                adminControls.style.display = "block";
+                overlay.style.display = "none";
+                popup.style.display = "none";
+                adminButton.style.display = "none";  // ボタンを非表示にする
+            } else {
+                alert("パスワードが間違っています");
+            }
+        }
+
+        // キャンセルボタン
+        function closePopup() {
+            overlay.style.display = "none";
+            popup.style.display = "none";
+        }
+
+        // 新しい数字を送信する
         function sendNumber() {
             const newNumberInput = document.getElementById('newNumber');
             const number = parseInt(newNumberInput.value);
 
-            if (!isNaN(number) && number >= 1 && number <= 75 && !numbers.includes(number)) {
-                numbers.push(number);
-                socket.emit('newNumber', number);
-                newNumberInput.value = '';
-                newNumberInput.focus();
+            if (!isNaN(number) && number >= 1 && number <= 75) {
+                alert("数字が送信されました: " + number);
+                newNumberInput.value = '';  // 入力をリセット
             } else {
                 alert("無効な数字です！");
             }
         }
 
+        // リセットボタン
         function resetNumbers() {
-            numbers = [];
-            socket.emit('resetNumbers');
+            alert("数字がリセットされました");
         }
     </script>
 </body>
