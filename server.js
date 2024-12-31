@@ -1,53 +1,41 @@
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
-const path = require('path');  // pathモジュールをインポート
+
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
-const basicAuth = require('express-basic-auth');
 
-app.use(basicAuth({
-    users: { 'admin': 'password' },
-    challenge: true,
-    unauthorizedResponse: 'Unauthorized'
-}));
+let numbers = [];
 
-app.get('/admin', (req, res) => {
-    res.send('管理者ページ');
-});
+// サーバーのルートを指定（クライアントのHTMLを返す）
+app.use(express.static('public'));
 
-// 静的ファイルを提供する設定（publicフォルダ内のファイルを提供）
-app.use(express.static(path.join(__dirname, 'public')));
-
-let numbers = []; // 現在表示している数字
-
+// クライアントからの接続を待機
 io.on('connection', (socket) => {
     console.log('a user connected');
-    socket.emit('updateNumbers', numbers);
 
+    // 新しい数字を受け取る処理
     socket.on('newNumber', (number) => {
-        if (!numbers.includes(number)) {
-            numbers.push(number); // 新しい数字を追加
-            io.emit('updateNumbers', numbers);
+        if (number >= 1 && number <= 75 && !numbers.includes(number)) {
+            numbers.push(number);
+            io.emit('updateNumbers', numbers);  // 全クライアントに更新を通知
         }
     });
 
-    socket.on('editNumber', (data) => {
-        numbers[data.index] = data.value; // 数字の編集
-        io.emit('updateNumbers', numbers);
-    });
-
+    // 数字リセット処理
     socket.on('resetNumbers', () => {
-        numbers = []; // 数字をリセット
-        io.emit('updateNumbers', numbers);
+        numbers = [];
+        io.emit('updateNumbers', numbers);  // 全クライアントにリセットを通知
     });
 
+    // 切断時の処理
     socket.on('disconnect', () => {
         console.log('user disconnected');
     });
 });
 
+// サーバーを3000番ポートで起動
 server.listen(3000, () => {
-    console.log('Server is running on http://localhost:3000');
+    console.log('listening on *:3000');
 });
