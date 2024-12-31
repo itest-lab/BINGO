@@ -259,9 +259,11 @@
         const urlParams = new URLSearchParams(window.location.search);
         const isAdmin = urlParams.get('admin') === 'true';
         
-        // 管理者用の機能を表示する処理
+        // 管理者用UIを表示する処理
         if (isAdmin) {
-            document.getElementById('admin-controls').style.display = 'block';
+            document.getElementById('admin-controls').style.display = 'block';  // 管理者用コントロールを表示
+        } else {
+            document.getElementById('admin-controls').style.display = 'none';   // 管理者用コントロールを非表示
         }
     </script>
 </body>
