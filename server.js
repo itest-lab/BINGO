@@ -18,8 +18,8 @@ io.on('connection', (socket) => {
     // 新しい数字を受け取る処理
     socket.on('newNumber', (number) => {
         if (number >= 1 && number <= 75 && !numbers.includes(number)) {
-            numbers.push(number);
-            io.emit('updateNumbers', numbers);  // 全クライアントに更新を通知
+            console.log('Received number:', number); // 受信した数字をログに出力
+            io.emit('updateNumbers', [number]);  // 新しい数字を全クライアントに送信
         }
     });
 
