@@ -243,7 +243,6 @@
         function checkPassword() {
             const password = document.getElementById('passwordInput').value;
             if (password === correctPassword) {
-                window.location.search = "admin=true"; // パスワードが正しい場合、URLにパラメータを追加
                 document.getElementById('admin-controls').style.display = 'block'; // 管理者モードを表示
                 closePasswordPopup();
             } else {
