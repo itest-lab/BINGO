@@ -255,8 +255,11 @@
         }
 
         socket.on('updateNumbers', updateNumbers);
-
-        const isAdmin = window.location.search.includes('admin=true');
+        // URLのクエリパラメータからadminの値を取得
+        const urlParams = new URLSearchParams(window.location.search);
+        const isAdmin = urlParams.get('admin') === 'true';
+        
+        // 管理者用の機能を表示する処理
         if (isAdmin) {
             document.getElementById('admin-controls').style.display = 'block';
         }
