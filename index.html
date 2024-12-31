@@ -256,15 +256,17 @@
 
         socket.on('updateNumbers', updateNumbers);
         
-        // URLからadminパラメータを取得してチェック
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('admin') === 'true') {
-            // 管理者用UIを表示
-            document.getElementById('admin-controls').style.display = 'block';
-        } else {
-            // 通常UI
-            document.getElementById('admin-controls').style.display = 'none';
-        }
+        // ページが読み込まれたときにクエリパラメータを取得
+        window.onload = function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const isAdmin = urlParams.get('admin') === 'true';  // admin=trueの場合、isAdminがtrueになる
+        
+            if (isAdmin) {
+                document.getElementById('admin-controls').style.display = 'block'; // 管理者UIを表示
+            } else {
+                document.getElementById('admin-controls').style.display = 'none'; // 通常UIを表示
+            }
+        };
     </script>
 </body>
 </html>
