@@ -86,7 +86,7 @@
         .admin-controls {
             position: fixed;
             bottom: 20px;
-            right: 20px; /* 管理者モードのすぐ右側に配置 */
+            left: 60px;
             z-index: 10;
             display: none;
             flex-direction: column;
@@ -185,23 +185,16 @@
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        const socket = io();
-        let numbers = [];
-        const adminButton = document.getElementById('admin-button');
-        const adminControls = document.getElementById('admin-controls');
-        const passwordPopup = document.getElementById('popup');
-        const overlay = document.getElementById('overlay');
-
-        // 管理者モードを確認
+        // ここで関数を先に定義
         function showPasswordPopup() {
-            overlay.style.display = 'block';
-            passwordPopup.style.display = 'block';
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('popup').style.display = 'block';
         }
 
         function checkPassword() {
             const password = document.getElementById('passwordInput').value;
             if (password === "1234") {
-                adminControls.style.display = 'flex'; // 管理者モードのコントロール表示
+                document.getElementById('admin-controls').style.display = 'block'; // 管理者モードを表示
                 closePasswordPopup();
             } else {
                 alert("パスワードが間違っています");
@@ -209,8 +202,39 @@
         }
 
         function closePasswordPopup() {
-            overlay.style.display = 'none';
-            passwordPopup.style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('popup').style.display = 'none';
+        }
+
+        const socket = io();
+        let numbers = [];
+        document.getElementById('admin-controls').style.display = 'none';
+
+        function getBingoColumnColor(number) {
+            if (number >= 1 && number <= 15) return 'B';
+            if (number >= 16 && number <= 30) return 'I';
+            if (number >= 31 && number <= 45) return 'N';
+            if (number >= 46 && number <= 60) return 'G';
+            if (number >= 61 && number <= 75) return 'O';
+            return '';
+        }
+
+        function updateNumbers(updatedNumbers) {
+            numbers = updatedNumbers;
+            const currentNumberDisplay = document.getElementById('currentNumberDisplay');
+            const pastNumbersDiv = document.getElementById('past-numbers');
+
+            const currentNumber = numbers[numbers.length - 1] || '--';
+            currentNumberDisplay.textContent = currentNumber;
+            currentNumberDisplay.className = `number ${getBingoColumnColor(currentNumber)}`;
+
+            pastNumbersDiv.innerHTML = numbers.map((num, index) => 
+                `<div 
+                    class="number ${getBingoColumnColor(num)}" 
+                    ${isAdmin ? `onclick="editNumber(${index})"` : ""}>
+                    ${num}
+                </div>`
+            ).reverse().join('');
         }
 
         function sendNumber() {
@@ -232,28 +256,7 @@
             socket.emit('resetNumbers');
         }
 
-        socket.on('updateNumbers', (updatedNumbers) => {
-            numbers = updatedNumbers;
-            const currentNumberDisplay = document.getElementById('currentNumberDisplay');
-            const pastNumbersDiv = document.getElementById('past-numbers');
-
-            const currentNumber = numbers[numbers.length - 1] || '--';
-            currentNumberDisplay.textContent = currentNumber;
-            currentNumberDisplay.className = `number ${getBingoColumnColor(currentNumber)}`;
-
-            pastNumbersDiv.innerHTML = numbers.map((num, index) => 
-                `<div class="number ${getBingoColumnColor(num)}">${num}</div>`
-            ).reverse().join('');
-        });
-
-        function getBingoColumnColor(number) {
-            if (number >= 1 && number <= 15) return 'B';
-            if (number >= 16 && number <= 30) return 'I';
-            if (number >= 31 && number <= 45) return 'N';
-            if (number >= 46 && number <= 60) return 'G';
-            if (number >= 61 && number <= 75) return 'O';
-            return '';
-        }
+        socket.on('updateNumbers', updateNumbers);
     </script>
 </body>
 </html>
