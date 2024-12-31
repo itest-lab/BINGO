@@ -187,9 +187,10 @@
     <script>
         const socket = io();
         let numbers = [];
-        let isAdmin = false; // 管理者モードを制御するフラグ
+        document.getElementById('admin-controls').style.display = 'none';
+        if (hash === '#admin') {
 
-        function getBingoColumnColor(number) {
+            function getBingoColumnColor(number) {
             if (number >= 1 && number <= 15) return 'B';
             if (number >= 16 && number <= 30) return 'I';
             if (number >= 31 && number <= 45) return 'N';
@@ -243,7 +244,6 @@
         function checkPassword() {
             const password = document.getElementById('passwordInput').value;
             if (password === "1234") {
-                isAdmin = true; // パスワードが正しければ管理者モードを有効に
                 document.getElementById('admin-controls').style.display = 'block'; // 管理者モードを表示
                 closePasswordPopup();
             } else {
