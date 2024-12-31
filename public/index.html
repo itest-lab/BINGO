@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>リアルタイムビンゴ</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            justify-content: center;
+            align-items: center;
+            background-color: #ffffff; /* 背景色を白に変更 */
+        }
+
+        #main-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        #current-number {
+            width: 700px;
+            height: 700px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f8f8f8;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-110%, -50%); 
+            border-radius: 10px;
+        }
+
+        #current-number .number {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px;
+            color: black;
+            font-size: 420px;
+            font-weight: bold;
+            border: 4px solid black;
+        }
+
+        #past-numbers {
+            margin-left: 47%;
+            display: grid;
+            grid-template-columns: repeat(10, 1fr); /* 最大10行の列 */
+            gap: 10px;
+            width: auto;
+            height: auto;
+            padding: 20px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-top: 20px;
+            padding-bottom: 20px;
+        }
+        .number {
+            font-size: 3em; /* 文字サイズを少し大きく */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 5px;
+            color: black;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            border: 2px solid black;
+            transition: transform 0.2s ease-in-out;
+            height: 70px;
+            width: 70px;
+        }
+
+        .number.B { background-color: #ff9999; }
+        .number.I { background-color: #ffcc99; }
+        .number.N { background-color: #ffff99; }
+        .number.G { background-color: #ccff99; }
+        .number.O { background-color: #99ccff; }
+
+        .admin-controls {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .admin-controls input, .admin-controls button {
+            padding: 10px;
+            font-size: 16px;
+        }
+
+        .admin-controls button {
+            cursor: pointer;
+        }
+
+        /* ポップアップ用スタイル */
+        .popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            border: 2px solid black;
+            border-radius: 10px;
+            padding: 20px;
+            z-index: 100;
+            display: none;
+            width: 400px;
+        }
+        .popup input {
+            display: block;
+            width: 90%;
+            padding: 10px;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        .popup button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 99;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="main-container">
+        <div id="current-number">
+            <div class="number" id="currentNumberDisplay">--</div>
+        </div>
+        <div id="past-numbers"></div>
+    </div>
+
+    <div class="admin-controls" id="admin-controls" style="display: none;">
+        <input type="number" id="newNumber" placeholder="数字を入力 (1~75)" autofocus>
+        <button onclick="sendNumber()">送信</button>
+        <button onclick="resetNumbers()">リセット</button>
+    </div>
+
+    <!-- ポップアップ -->
+    <div class="overlay" id="overlay"></div>
+    <div class="popup" id="popup">
+        <div id="popupContent">
+            <p>現在の数字: <strong id="currentValue">--</strong></p>
+            <input type="number" id="editInput" placeholder="新しい数字を入力">
+            <button onclick="confirmEdit()">確定</button>
+            <button onclick="closePopup()">キャンセル</button>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        let numbers = [];
+        let editingIndex = null;
+
+        function getBingoColumnColor(number) {
+            if (number >= 1 && number <= 15) return 'B';
+            if (number >= 16 && number <= 30) return 'I';
+            if (number >= 31 && number <= 45) return 'N';
+            if (number >= 46 && number <= 60) return 'G';
+            if (number >= 61 && number <= 75) return 'O';
+            return '';
+        }
+
+        function updateNumbers(updatedNumbers) {
+            numbers = updatedNumbers;
+            const currentNumberDisplay = document.getElementById('currentNumberDisplay');
+            const pastNumbersDiv = document.getElementById('past-numbers');
+
+            const currentNumber = numbers[numbers.length - 1] || '--';
+            currentNumberDisplay.textContent = currentNumber;
+            currentNumberDisplay.className = `number ${getBingoColumnColor(currentNumber)}`;
+
+            pastNumbersDiv.innerHTML = numbers.map((num, index) => `
+                <div 
+                    class="number ${getBingoColumnColor(num)}" 
+                    ${isAdmin ? `onclick="editNumber(${index})"` : ""}>
+                    ${num}
+                </div>
+            `).reverse().join('');
+        }
+
+        function editNumber(index) {
+            if (!isAdmin) return;
+            editingIndex = index;
+
+            const currentValue = numbers[index];
+            document.getElementById('currentValue').textContent = currentValue;
+            const editInput = document.getElementById('editInput');
+            editInput.value = ''; // 前の入力内容をクリア
+
+            // ポップアップを表示
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('popup').style.display = 'block';
+
+            // ポップアップが表示されるのを待ってからフォーカスを設定
+            setTimeout(() => {
+                editInput.focus();
+            }, 100); // 100msの遅延でフォーカス
+        }
+
+        function confirmEdit() {
+            const newValue = parseInt(document.getElementById('editInput').value);
+            if (!isNaN(newValue) && newValue >= 1 && newValue <= 75 && !numbers.includes(newValue)) {
+                numbers[editingIndex] = newValue;
+                socket.emit('editNumber', { index: editingIndex, value: newValue });
+                closePopup();
+            } else {
+                alert("無効な数字です！");
+            }
+        }
+
+        function closePopup() {
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('popup').style.display = 'none';
+        }
+
+        function sendNumber() {
+            const newNumberInput = document.getElementById('newNumber');
+            const number = parseInt(newNumberInput.value);
+
+            if (!isNaN(number) && number >= 1 && number <= 75 && !numbers.includes(number)) {
+                numbers.push(number);
+                socket.emit('newNumber', number);
+                newNumberInput.value = '';
+                newNumberInput.focus();
+            } else {
+                alert("無効な数字です！");
+            }
+        }
+
+        function resetNumbers() {
+            numbers = [];
+            socket.emit('resetNumbers');
+        }
+
+        socket.on('updateNumbers', updateNumbers);
+
+        const isAdmin = window.location.search.includes('admin=true');
+        if (isAdmin) {
+            document.getElementById('admin-controls').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
