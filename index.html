@@ -31,7 +31,7 @@
             position: absolute;
             left: 50%;
             top: 50%;
-            transform: translate(-110%, -50%); 
+            transform: translate(-110%, -50%);
             border-radius: 10px;
         }
 
@@ -51,7 +51,7 @@
         #past-numbers {
             margin-left: 47%;
             display: grid;
-            grid-template-columns: repeat(10, 1fr); /* 最大10行の列 */
+            grid-template-columns: repeat(10, 1fr);
             gap: 10px;
             width: auto;
             height: auto;
@@ -62,7 +62,7 @@
             padding-bottom: 20px;
         }
         .number {
-            font-size: 3em; /* 文字サイズを少し大きく */
+            font-size: 3em;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -179,6 +179,7 @@
             <p>パスワードを入力してください:</p>
             <input type="password" id="passwordInput" placeholder="パスワード">
             <button onclick="checkPassword()">確認</button>
+            <button onclick="closePasswordPopup()">キャンセル</button>
         </div>
     </div>
 
