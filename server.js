@@ -6,36 +6,31 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
-let numbers = [];
+let numbers = []; // グローバル変数で数字を保持
 
-// サーバーのルートを指定（クライアントのHTMLを返す）
-app.use(express.static('public'));
-
-// クライアントからの接続を待機
 io.on('connection', (socket) => {
-    console.log('a user connected');
+    console.log('クライアントが接続しました');
 
-    // 新しい数字を受け取る処理
+    // クライアントに現在の numbers を送信
+    socket.emit('updateNumbers', numbers);
+
+    // クライアントから新しい数字が送られた場合
     socket.on('newNumber', (number) => {
-        if (number >= 1 && number <= 75 && !numbers.includes(number)) {
-            console.log('Received number:', number); // 受信した数字をログに出力
-            io.emit('updateNumbers', [number]);  // 新しい数字を全クライアントに送信
+        if (!numbers.includes(number)) {
+            numbers.push(number);
+            io.emit('updateNumbers', numbers); // 全クライアントに更新通知
         }
     });
 
-    // 数字リセット処理
+    // リセット要求
     socket.on('resetNumbers', () => {
         numbers = [];
-        io.emit('updateNumbers', numbers);  // 全クライアントにリセットを通知
-    });
-
-    // 切断時の処理
-    socket.on('disconnect', () => {
-        console.log('user disconnected');
+        io.emit('updateNumbers', numbers); // 全クライアントにリセットを通知
     });
 });
 
-// サーバーを3000番ポートで起動
+app.use(express.static('public'));
+
 server.listen(3000, () => {
-    console.log('listening on *:3000');
+    console.log('サーバーがポート 3000 で起動しました');
 });
