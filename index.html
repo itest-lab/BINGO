@@ -66,25 +66,45 @@
         .number.G { background-color: #ccff99; }
         .number.O { background-color: #99ccff; }
 
+        /* 管理者モードのコントロール */
         .admin-controls {
-            position: fixed;
-            bottom: 80px;
-            left: 20px;
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
             z-index: 10;
-            display: flex;
+            display: none;
             flex-direction: column;
             gap: 10px;
+            width: 300px;
+            text-align: center;
         }
 
         .admin-controls input, .admin-controls button {
             padding: 10px;
             font-size: 16px;
+            width: 100%;
         }
 
         .admin-controls button {
             cursor: pointer;
         }
 
+        /* 管理者モードボタンのスタイル */
+        #adminButton {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            z-index: 100;
+        }
+
+        /* パスワード入力ポップアップ */
         .popup {
             position: fixed;
             top: 50%;
@@ -114,6 +134,7 @@
             cursor: pointer;
         }
 
+        /* オーバーレイ */
         .overlay {
             position: fixed;
             top: 0;
@@ -134,13 +155,15 @@
         <div id="past-numbers"></div>
     </div>
 
-    <div class="admin-controls" id="admin-controls" style="display: none;">
+    <!-- 管理者モードのコントロール -->
+    <div class="admin-controls" id="admin-controls">
         <input type="number" id="newNumber" placeholder="数字を入力 (1~75)" autofocus>
         <button onclick="sendNumber()">送信</button>
         <button onclick="resetNumbers()">リセット</button>
     </div>
 
-    <button id="adminButton" onclick="showPasswordPrompt()" style="position: fixed; bottom: 20px; right: 20px; padding: 10px 20px;">管理者モード</button>
+    <!-- 管理者モードボタン -->
+    <button id="adminButton" onclick="showPasswordPrompt()">管理者モード</button>
 
     <!-- パスワード入力ポップアップ -->
     <div class="overlay" id="overlay"></div>
