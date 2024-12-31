@@ -255,7 +255,7 @@
                 numbers.push(number);
                 socket.emit('newNumber', number);
                 newNumberInput.value = '';
-                newNumberInput.focus();
+                updateNumbers(numbers);
             } else {
                 alert("無効な数字です！");
             }
@@ -263,17 +263,25 @@
 
         function resetNumbers() {
             numbers = [];
+            updateNumbers(numbers);
             socket.emit('resetNumbers');
         }
 
-        socket.on('updateNumbers', updateNumbers);
-
+        // 管理者モードの切り替え
         let isAdmin = false;
 
         function toggleAdminMode() {
             isAdmin = !isAdmin;
             document.getElementById('admin-controls').style.display = isAdmin ? 'block' : 'none';
             document.getElementById('adminButton').textContent = isAdmin ? '管理者モード終了' : '管理者モード';
+
+            // 管理者モードに切り替わった場合にポップアップを表示
+            if (isAdmin) {
+                document.getElementById('overlay').style.display = 'block';
+                document.getElementById('popup').style.display = 'block';
+            } else {
+                closePopup();
+            }
         }
     </script>
 </body>
