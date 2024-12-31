@@ -220,27 +220,29 @@
         }
 
         function updateNumbers(updatedNumbers) {
+            console.log("Updated numbers:", updatedNumbers); // 更新された数字を表示
             numbers = updatedNumbers;
             const currentNumberDisplay = document.getElementById('currentNumberDisplay');
             const pastNumbersDiv = document.getElementById('past-numbers');
-
+        
             const currentNumber = numbers[numbers.length - 1] || '--';
             currentNumberDisplay.textContent = currentNumber;
             currentNumberDisplay.className = `number ${getBingoColumnColor(currentNumber)}`;
-
+        
             pastNumbersDiv.innerHTML = numbers.map((num, index) => 
                 `<div 
                     class="number ${getBingoColumnColor(num)}" 
                     ${isAdmin ? `onclick="editNumber(${index})"` : ""}>
                     ${num}
-                </div>`
+                </div>` 
             ).reverse().join('');
         }
 
         function sendNumber() {
             const newNumberInput = document.getElementById('newNumber');
             const number = parseInt(newNumberInput.value);
-
+            console.log("Input number:", number); // 値をコンソールに表示
+        
             if (!isNaN(number) && number >= 1 && number <= 75 && !numbers.includes(number)) {
                 numbers.push(number);
                 socket.emit('newNumber', number);
