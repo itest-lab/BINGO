@@ -257,10 +257,7 @@
 
         socket.on('updateNumbers', updateNumbers);
 
-        const isAdmin = window.location.search.includes('admin=true');
-        if (isAdmin) {
-            document.getElementById('admin-controls').style.display = 'block';
-        }
+        const isAdmin = false; // 管理者モードのフラグ。URLを使わずに管理者モードにする場合はここを変更する
     </script>
 </body>
 </html>
