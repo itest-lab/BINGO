@@ -156,6 +156,23 @@
     </style>
 </head>
 <body>
+
+    <h1>Socket.IO Test</h1>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        // Socket.IO の初期化
+        const socket = io();
+
+        // サーバーからのメッセージを受信
+        socket.on('message', (msg) => {
+            console.log('サーバーからのメッセージ:', msg);
+        });
+
+        // サーバーにメッセージを送信
+        socket.emit('message', 'クライアントからのメッセージ');
+
+    </script>
+    
     <div id="main-container">
         <div id="current-number">
             <div class="number" id="currentNumberDisplay">--</div>
