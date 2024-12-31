@@ -185,12 +185,32 @@
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
+        // ここで関数を先に定義
+        function showPasswordPopup() {
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('popup').style.display = 'block';
+        }
+
+        function checkPassword() {
+            const password = document.getElementById('passwordInput').value;
+            if (password === "1234") {
+                document.getElementById('admin-controls').style.display = 'block'; // 管理者モードを表示
+                closePasswordPopup();
+            } else {
+                alert("パスワードが間違っています");
+            }
+        }
+
+        function closePasswordPopup() {
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('popup').style.display = 'none';
+        }
+
         const socket = io();
         let numbers = [];
         document.getElementById('admin-controls').style.display = 'none';
-        if (hash === '#admin') {
 
-            function getBingoColumnColor(number) {
+        function getBingoColumnColor(number) {
             if (number >= 1 && number <= 15) return 'B';
             if (number >= 16 && number <= 30) return 'I';
             if (number >= 31 && number <= 45) return 'N';
@@ -234,26 +254,6 @@
         function resetNumbers() {
             numbers = [];
             socket.emit('resetNumbers');
-        }
-
-        function showPasswordPopup() {
-            document.getElementById('overlay').style.display = 'block';
-            document.getElementById('popup').style.display = 'block';
-        }
-
-        function checkPassword() {
-            const password = document.getElementById('passwordInput').value;
-            if (password === "1234") {
-                document.getElementById('admin-controls').style.display = 'block'; // 管理者モードを表示
-                closePasswordPopup();
-            } else {
-                alert("パスワードが間違っています");
-            }
-        }
-
-        function closePasswordPopup() {
-            document.getElementById('overlay').style.display = 'none';
-            document.getElementById('popup').style.display = 'none';
         }
 
         socket.on('updateNumbers', updateNumbers);
