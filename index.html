@@ -88,7 +88,7 @@
             bottom: 20px;
             left: 20px;
             z-index: 10;
-            display: flex;
+            display: none;
             flex-direction: column;
             gap: 10px;
         }
@@ -163,7 +163,7 @@
         <div id="past-numbers"></div>
     </div>
 
-    <div class="admin-controls" id="admin-controls" style="display: none;">
+    <div class="admin-controls" id="admin-controls">
         <input type="number" id="newNumber" placeholder="数字を入力 (1~75)" autofocus>
         <button onclick="sendNumber()">送信</button>
         <button onclick="resetNumbers()">リセット</button>
@@ -187,8 +187,8 @@
     <script>
         const socket = io();
         let numbers = [];
-        let editingIndex = null;
-        const correctPassword = "admin"; // パスワードをここで先に定義
+        let isAdmin = false; // 管理者モードを制御するフラグ
+        const correctPassword = "admin"; // 正しいパスワード
 
         function getBingoColumnColor(number) {
             if (number >= 1 && number <= 15) return 'B';
@@ -244,6 +244,7 @@
         function checkPassword() {
             const password = document.getElementById('passwordInput').value;
             if (password === correctPassword) {
+                isAdmin = true; // パスワードが正しければ管理者モードを有効に
                 document.getElementById('admin-controls').style.display = 'block'; // 管理者モードを表示
                 closePasswordPopup();
             } else {
@@ -257,8 +258,6 @@
         }
 
         socket.on('updateNumbers', updateNumbers);
-
-        const isAdmin = false; // 管理者モードのフラグ。URLを使わずに管理者モードにする場合はここを変更する
     </script>
 </body>
 </html>
