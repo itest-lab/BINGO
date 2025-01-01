@@ -313,10 +313,10 @@ let targetArray = []; // 配列を初期化
 function sendNumber(someValue) {
     console.log("Received someValue:", someValue); // デバッグ用ログ
 
-    // 値が未定義または null の場合
+    // 未定義または null の場合
     if (someValue === undefined || someValue === null) {
         console.error("someValue is undefined or null. Cannot add to the array.");
-        return; // 処理を中断
+        return;
     }
 
     // 配列チェック
@@ -325,7 +325,7 @@ function sendNumber(someValue) {
         return;
     }
 
-    // 配列に値を追加
+    // 値を配列に追加
     if (targetArray.includes(someValue)) {
         console.log(`${someValue} is already in the array.`);
     } else {
@@ -334,9 +334,17 @@ function sendNumber(someValue) {
     }
 }
 
-// 実行例
-sendNumber(5); // "5 has been added to the array."
-sendNumber();  // "someValue is undefined or null. Cannot add to the array."
+// 値を渡して実行
+let value = 5;
+sendNumber(value); // "5 has been added to the array."
+
+// 未定義の変数を渡すとき
+let undefinedValue;
+sendNumber(undefinedValue); // "someValue is undefined or null. Cannot add to the array."
+
+// 引数なしで呼び出し
+sendNumber(); // "someValue is undefined or null. Cannot add to the array."
+
 
 
         // 数字リストをリセットする関数
