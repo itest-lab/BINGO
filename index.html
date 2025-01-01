@@ -211,13 +211,12 @@
         }
     </style>
 
-    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
     <script>
         const socket = io();
         let numbers = [];
         let editingIndex = null;
         let isAdmin = false; // 管理者モードの状態
-
 
         function getBingoColumnColor(number) {
             if (number >= 1 && number <= 15) return 'B';
