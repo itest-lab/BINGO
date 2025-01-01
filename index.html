@@ -289,6 +289,14 @@
             const newNumberInput = document.getElementById('newNumber');
             const number = parseInt(newNumberInput.value);
 
+            if (numbers.includes(newNumber)) {
+                console.log('数字はすでに存在しています');
+            } else {
+                console.log('新しい数字です:', newNumber);
+                numbers.push(newNumber);
+                socket.emit('newNumber', newNumber); // サーバーに送信
+            }
+            
             if (!isNaN(number) && number >= 1 && number <= 75 && !numbers.includes(number)) {
                 numbers.push(number);
                 socket.emit('newNumber', number);
@@ -314,8 +322,9 @@
                 closePasswordPopup();
                 newNumberInput.focus(); // フォーカス設定
 
-                // 管理者モードに切り替えた後に、既出の数字を再描画する
-                updateNumbers(numbers); // ここで数字リストを再描画
+            // 管理者モードに切り替えた後に、既出の数字を再描画する
+            updateNumbers(numbers); // ここで数字リストを再描画
+                isAdmin = true;
             } else {
                 alert('パスワードが間違っています');
             }
@@ -331,6 +340,12 @@
             document.getElementById('password-popup').style.display = 'block';
             passwordInput.focus();
         }
+
+        // サーバーからのデータを受信
+        socket.on('updateNumbers', (data) => {
+            numbers = data || []; // 空配列で初期化
+            console.log('サーバーから更新された数字リスト:', numbers);
+        });
 
         // サーバーから数字を更新するデータを受け取る
         socket.on('updateNumbers', updateNumbers);
