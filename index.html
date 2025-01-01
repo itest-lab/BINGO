@@ -217,6 +217,7 @@
         let numbers = [];
         let editingIndex = null;
         let isAdmin = false; // 管理者モードの状態
+        let targetArray = window.myArray || []; // 未定義の場合は空配列を代入
 
         function getBingoColumnColor(number) {
             if (number >= 1 && number <= 15) return 'B';
@@ -285,26 +286,40 @@
         }
 
         // 新しい番号を送信する関数
-        function sendNumber() {
-            const newNumberInput = document.getElementById('newNumber');
-            const number = parseInt(newNumberInput.value);
+//        function sendNumber() {
+//            const newNumberInput = document.getElementById('newNumber');
+//            const number = parseInt(newNumberInput.value);
 
-            const numberToSend = newNumber; // 送信したい数字
-            if (numbers.includes(numberToSend)) {
-                console.log('数字はすでに存在しています');
-            } else {
-                console.log('新しい数字です:', numberToSend);
-                numbers.push(numberToSend);
-                socket.emit('numberToSend', numberToSend); // サーバーに送信
-            }
+//            const numberToSend = newNumber; // 送信したい数字
+//            if (numbers.includes(numberToSend)) {
+//                console.log('数字はすでに存在しています');
+//            } else {
+//                console.log('新しい数字です:', numberToSend);
+//                numbers.push(numberToSend);
+//                socket.emit('numberToSend', numberToSend); // サーバーに送信
+//            }
             
-            if (!isNaN(numberToSend) && number >= 1 && number <= 75 && !numbers.includes(numberToSend)) {
-                numbers.push(numberToSend);
-                socket.emit('newNumber', numberToSend);
-                newNumberInput.value = '';
-                newNumberInput.focus();
+//            if (!isNaN(numberToSend) && number >= 1 && number <= 75 && !numbers.includes(numberToSend)) {
+//                numbers.push(numberToSend);
+//                socket.emit('newNumber', numberToSend);
+//                newNumberInput.value = '';
+//                newNumberInput.focus();
+//            } else {
+//                alert("無効な数字です！");
+//            }
+//        }
+
+        function sendNumber(someValue) {
+            if (!Array.isArray(targetArray)) {
+                console.error("targetArray is not an array.");
+                return;
+            }
+        
+            if (targetArray.includes(someValue)) {
+                console.log(`${someValue} is already in the array.`);
             } else {
-                alert("無効な数字です！");
+                targetArray.push(someValue);
+                console.log(`${someValue} has been added to the array.`);
             }
         }
 
