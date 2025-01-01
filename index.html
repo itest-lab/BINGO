@@ -289,17 +289,18 @@
             const newNumberInput = document.getElementById('newNumber');
             const number = parseInt(newNumberInput.value);
 
-            if (numbers.includes(newNumber)) {
+            const numberToSend = newNumber; // 送信したい数字
+            if (numbers.includes(numberToSend)) {
                 console.log('数字はすでに存在しています');
             } else {
-                console.log('新しい数字です:', newNumber);
-                numbers.push(newNumber);
-                socket.emit('newNumber', newNumber); // サーバーに送信
+                console.log('新しい数字です:', numberToSend);
+                numbers.push(numberToSend);
+                socket.emit('numberToSend', numberToSend); // サーバーに送信
             }
             
-            if (!isNaN(number) && number >= 1 && number <= 75 && !numbers.includes(number)) {
-                numbers.push(number);
-                socket.emit('newNumber', number);
+            if (!isNaN(numberToSend) && number >= 1 && number <= 75 && !numbers.includes(numberToSend)) {
+                numbers.push(numberToSend);
+                socket.emit('newNumber', numberToSend);
                 newNumberInput.value = '';
                 newNumberInput.focus();
             } else {
