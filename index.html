@@ -217,7 +217,6 @@
         let numbers = [];
         let editingIndex = null;
         let isAdmin = false; // 管理者モードの状態
-        let targetArray = window.myArray || []; // 未定義の場合は空配列を代入
 
         function getBingoColumnColor(number) {
             if (number >= 1 && number <= 15) return 'B';
@@ -309,19 +308,36 @@
 //            }
 //        }
 
-        function sendNumber(someValue) {
-            if (!Array.isArray(targetArray)) {
-                console.error("targetArray is not an array.");
-                return;
-            }
-        
-            if (targetArray.includes(someValue)) {
-                console.log(`${someValue} is already in the array.`);
-            } else {
-                targetArray.push(someValue);
-                console.log(`${someValue} has been added to the array.`);
-            }
-        }
+let targetArray = []; // 配列を初期化
+
+function sendNumber(someValue) {
+    console.log("Received someValue:", someValue); // デバッグ用ログ
+
+    // 値が未定義または null の場合
+    if (someValue === undefined || someValue === null) {
+        console.error("someValue is undefined or null. Cannot add to the array.");
+        return; // 処理を中断
+    }
+
+    // 配列チェック
+    if (!Array.isArray(targetArray)) {
+        console.error("targetArray is not an array.");
+        return;
+    }
+
+    // 配列に値を追加
+    if (targetArray.includes(someValue)) {
+        console.log(`${someValue} is already in the array.`);
+    } else {
+        targetArray.push(someValue);
+        console.log(`${someValue} has been added to the array.`);
+    }
+}
+
+// 実行例
+sendNumber(5); // "5 has been added to the array."
+sendNumber();  // "someValue is undefined or null. Cannot add to the array."
+
 
         // 数字リストをリセットする関数
         function resetNumbers() {
