@@ -16,13 +16,11 @@
             align-items: center;
             background-color: #eaeaea;
         }
-
         #main-container {
             display: flex;
             width: 100%;
             height: 100%;
         }
-
         #current-number {
             width: 700px;
             height: 700px;
@@ -36,7 +34,6 @@
             transform: translate(-110%, -50%);
             border-radius: 10px;
         }
-
         #current-number .number {
             width: 100%;
             height: 100%;
@@ -49,22 +46,23 @@
             font-weight: bold;
             border: 4px solid black;
         }
-
         #past-numbers {
             margin-left: 47%;
             display: grid;
             grid-template-columns: repeat(10, 1fr);
+            /* 列数は10に設定 */
             grid-template-rows: repeat(7, 1fr);
+            /* 7行に固定 */
             gap: 10px;
             width: auto;
             height: 490px;
+            /* 7行分の高さに合わせて設定 */
             padding: 20px;
             overflow-y: auto;
             overflow-x: hidden;
             padding-top: 20px;
             padding-bottom: 20px;
         }
-
         .number {
             font-size: 3em;
             display: flex;
@@ -80,27 +78,21 @@
             height: 70px;
             width: 70px;
         }
-
-        .B {
+        .number.B {
             background-color: #ff9999;
         }
-
-        .I {
+        .number.I {
             background-color: #ffcc99;
         }
-
-        .N {
+        .number.N {
             background-color: #ffff99;
         }
-
-        .G {
+        .number.G {
             background-color: #ccff99;
         }
-
-        .O {
+        .number.O {
             background-color: #99ccff;
         }
-
         .admin-controls {
             position: fixed;
             bottom: 20px;
@@ -108,19 +100,17 @@
             z-index: 10;
             display: none;
             flex-direction: row;
+            /* 横並びに変更 */
             gap: 10px;
         }
-
         .admin-controls input,
         .admin-controls button {
             padding: 10px;
             font-size: 16px;
         }
-
         .admin-controls button {
             cursor: pointer;
         }
-
         /* ポップアップ用スタイル */
         .popup {
             position: fixed;
@@ -135,7 +125,6 @@
             display: none;
             width: 400px;
         }
-
         .popup input {
             display: block;
             width: 90%;
@@ -143,14 +132,12 @@
             font-size: 16px;
             margin-top: 10px;
         }
-
         .popup button {
             margin-top: 10px;
             padding: 10px 20px;
             font-size: 16px;
             cursor: pointer;
         }
-
         .overlay {
             position: fixed;
             top: 0;
@@ -161,21 +148,19 @@
             z-index: 99;
             display: none;
         }
-
         /* 管理者モードボタン */
         #admin-button {
             position: fixed;
             bottom: 20px;
             left: 20px;
             padding: 10px 20px;
-            background-color: #4a4a4a;
+            background-color: #007bff;
             color: white;
             border: none;
             font-size: 16px;
             cursor: pointer;
             z-index: 10;
         }
-
         /* パスワードポップアップ */
         #password-popup {
             position: fixed;
@@ -190,7 +175,6 @@
             display: none;
             width: 300px;
         }
-
         #password-popup input {
             display: block;
             width: 90%;
@@ -198,7 +182,6 @@
             font-size: 16px;
             margin-top: 10px;
         }
-
         #password-popup button {
             margin-top: 10px;
             padding: 10px 20px;
@@ -206,10 +189,7 @@
             cursor: pointer;
         }
     </style>
-
-    <!-- Firebase SDKの読み込み -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
 
 </head>
 <body>
@@ -220,104 +200,190 @@
         <div id="past-numbers"></div>
     </div>
     <div class="admin-controls" id="admin-controls">
-        <input type="text" id="numberInput" placeholder="数字を入力してください" autocomplete="off" autocorrect="off">
-        <button id="sendNumber">送信</button>
+        <input type="number" id="newNumber" placeholder="新しい数字を追加">
+        <button onclick="sendNumber()">送信</button>
         <button onclick="resetNumbers()">リセット</button>
     </div>
-    <button id="admin-button">参加者モード</button>
-
-    <script>
-        // Firebaseの設定
-        const firebaseConfig = {
-            apiKey: "AIzaSyBv7bPCjXzKEtzqGtmWl9fJWLCw_1qXOIc",
-            authDomain: "bingo-main.firebaseapp.com",
-            databaseURL: "https://bingo-main-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "bingo-main",
-            storageBucket: "bingo-main.firebasestorage.app",
-            messagingSenderId: "945725247317",
-            appId: "1:945725247317:web:bfb58e8a76b452665b69dc",
-            measurementId: "G-QJJ73C5KBX"
-        };
-
-        // Firebaseを初期化
-        const app = firebase.initializeApp(firebaseConfig);
-        const db = firebase.database(app);
-
-        // 管理者モードフラグ
-        let isAdmin = false;
-
-        // 参加者モード/管理者モードの切り替え
-        document.getElementById('admin-button').addEventListener('click', () => {
-            isAdmin = !isAdmin;
-            document.getElementById('admin-controls').style.display = isAdmin ? 'flex' : 'none';
-            document.getElementById('admin-button').textContent = isAdmin ? '管理者モード' : '参加者モード';
+    <div id="overlay" class="overlay" onclick="closePopup()"></div>
+    <div id="popup" class="popup">
+        <h3>編集中の数字: <span id="currentValue"></span></h3>
+        <input id="editInput" type="number" min="1" max="75" placeholder="新しい数字">
+        <button onclick="confirmEdit()">変更確定</button>
+        <button onclick="closePopup()">キャンセル</button>
+    </div>
+    <button id="admin-button" onclick="showPasswordPopup()">管理者モード</button>
+    <div id="password-popup" class="popup">
+        <input type="password" id="passwordInput" placeholder="パスワード">
+        <button onclick="checkPassword()">確認</button>
+        <button onclick="closePasswordPopup()">閉じる</button>
+    </div>
+        <script>
+        const socket = io();
+        // Server-side: Listen for 'newNumber' and update numbers list
+        let numbers = []; // Maintain the list of numbers on the server
+        
+        io.on('connection', (socket) => {
+            // Send the current list of numbers to the new client
+            socket.emit('updateNumbers', numbers);
+        
+            // Add a new number
+            socket.on('newNumber', (number) => {
+                if (!numbers.includes(number)) {
+                    numbers.push(number);
+                    io.emit('updateNumbers', numbers); // Broadcast the updated list to all clients
+                }
+            });
+        
+            // Reset the numbers
+            socket.on('resetNumbers', () => {
+                numbers = [];
+                io.emit('updateNumbers', numbers);
+            });
+        
+            // Edit a number
+            socket.on('editNumber', ({ index, value }) => {
+                if (index >= 0 && index < numbers.length && !numbers.includes(value)) {
+                    numbers[index] = value;
+                    io.emit('updateNumbers', numbers); // Broadcast the updated list
+                }
+            });
         });
 
-        // Firebaseの参照
-        const bingoRef = db.ref('bingo');
-
-        // 送信ボタンが押された時の処理
-        document.getElementById('sendNumber').addEventListener('click', () => {
-            if (!isAdmin) {
-                alert('管理者モードでなければ数字を送信できません');
+        let editingIndex = null;
+        let isAdmin = false; // 管理者モードの状態
+        function getBingoColumnColor(number) {
+            if (number >= 1 && number <= 15) return 'B';
+            if (number >= 16 && number <= 30) return 'I';
+            if (number >= 31 && number <= 45) return 'N';
+            if (number >= 46 && number <= 60) return 'G';
+            if (number >= 61 && number <= 75) return 'O';
+            return '';
+        }
+        // 既出の数字を更新する関数
+        function updateNumbers(updatedNumbers) {
+            numbers = updatedNumbers; // Update the local numbers list
+            const currentNumberDisplay = document.getElementById('currentNumberDisplay');
+            const pastNumbersDiv = document.getElementById('past-numbers');
+        
+            // Display the current number
+            const currentNumber = numbers[numbers.length - 1] || '--';
+            currentNumberDisplay.textContent = currentNumber;
+            currentNumberDisplay.className = 'number ' + getBingoColumnColor(currentNumber);
+        
+            // Display past numbers
+            pastNumbersDiv.innerHTML = numbers
+                .map((num, index) => {
+                    return `<div class="number ${getBingoColumnColor(num)}" ${
+                        isAdmin ? `onclick="editNumber(${index})"` : ''
+                    }>${num}</div>`;
+                })
+                .reverse()
+                .join('');
+        }
+            
+        // 既出の数字を編集するための関数
+        function editNumber(index) {
+            if (!isAdmin) return;
+            editingIndex = index;
+            const currentValue = numbers[index];
+            document.getElementById('currentValue').textContent = currentValue;
+            const editInput = document.getElementById('editInput');
+            editInput.value = ''; // 初期化
+            editInput.blur(); // フォーカスを外す
+            // ポップアップを表示
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('popup').style.display = 'block';
+            // 少し待ってからフォーカスを設定
+            setTimeout(function() {
+                editInput.focus(); // フォーカス設定
+            }, 0); // 即座にフォーカスを設定するために0ミリ秒後に実行
+        }
+        // 編集内容を確定する関数
+        function confirmEdit() {
+            const newValue = parseInt(document.getElementById('editInput').value);
+            if (!isNaN(newValue) && newValue >= 1 && newValue <= 75 && !numbers.includes(newValue)) {
+                numbers[editingIndex] = newValue;
+                socket.emit('editNumber', { index: editingIndex, value: newValue });
+                closePopup();
+                newNumberInput.focus(); // フォーカス設定
+            } else {
+                alert("無効な数字です！");
+            }
+        }
+        // ポップアップを閉じる関数
+        function closePopup() {
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('popup').style.display = 'none';
+        }
+        // 新しい番号を送信する関数
+        function sendNumber() {
+            const newNumberInput = document.getElementById('newNumber');
+            const numberToSend = parseInt(newNumberInput.value); // Parse the input value
+        
+            if (isNaN(numberToSend) || numberToSend < 1 || numberToSend > 75) {
+                alert("無効な数字です！ (1〜75の間の数字を入力してください)");
                 return;
             }
-
-            const inputField = document.getElementById('numberInput');
-            const inputValue = inputField.value.trim();
-
-            if (!inputValue || isNaN(inputValue)) {
-                alert('有効な数字を入力してください');
+        
+            if (numbers.includes(numberToSend)) {
+                alert("この数字はすでに存在します！");
                 return;
             }
-
-            // Firebaseにデータを書き込む
-            bingoRef.set({
-                currentNumber: inputValue,
-                pastNumbers: [inputValue, ...(pastNumbers || [])]
-            });
-
-            inputField.value = '';
-        });
-
-        // データ変更をリアルタイムで監視
-        bingoRef.on('value', (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                updateCurrentNumber(data.currentNumber);
-                updatePastNumbers(data.pastNumbers);
-            }
-        });
-
-        // 現在の数字を更新
-        function updateCurrentNumber(number) {
-            document.getElementById('currentNumberDisplay').textContent = number || '--';
+        
+            // Add the number locally and send it to the server
+            numbers.push(numberToSend);
+            socket.emit('newNumber', numberToSend); // Inform the server about the new number
+        
+            // Clear the input field and update the display
+            newNumberInput.value = '';
+            updateNumbers(numbers); // Update the UI
+            newNumberInput.focus(); // Focus back on input
         }
 
-        // 既出の数字を更新
-        function updatePastNumbers(numbers) {
-            const pastNumbersContainer = document.getElementById('past-numbers');
-            pastNumbersContainer.innerHTML = '';
-            (numbers || []).forEach(number => {
-                const numberElement = document.createElement('div');
-                numberElement.className = 'number';
-                numberElement.textContent = number;
-                pastNumbersContainer.appendChild(numberElement);
-            });
-        }
-
-        // リセットボタンの処理
+        // 数字リストをリセットする関数
         function resetNumbers() {
-            if (!isAdmin) {
-                alert('管理者モードでなければリセットできません');
-                return;
-            }
-            bingoRef.set({
-                currentNumber: '--',
-                pastNumbers: []
-            });
+            numbers = [];
+            socket.emit('resetNumbers');
         }
+        // 管理者モードのパスワードを入力して確認する関数
+        function checkPassword() {
+            const password = document.getElementById('passwordInput').value;
+            if (password === '1111') {
+                isAdmin = true;
+                document.getElementById('admin-controls').style.display = 'flex';
+                closePasswordPopup();
+                newNumberInput.focus(); // フォーカス設定
+            // 管理者モードに切り替えた後に、既出の数字を再描画する
+            updateNumbers(numbers); // ここで数字リストを再描画
+                isAdmin = true;
+            } else {
+                alert('パスワードが間違っています');
+            }
+        }
+        // パスワードポップアップを閉じる関数
+        function closePasswordPopup() {
+            document.getElementById('password-popup').style.display = 'none';
+        }
+        // 管理者モードを切り替えるためにパスワードポップアップを表示する
+        function showPasswordPopup() {
+            document.getElementById('password-popup').style.display = 'block';
+            passwordInput.focus();
+        }
+        // サーバーからのデータを受信
+        socket.on('updateNumbers', (data) => {
+            numbers = data || []; // 空配列で初期化
+            console.log('サーバーから更新された数字リスト:', numbers);
+        });
+        // サーバーから数字を更新するデータを受け取る
+        socket.on('updateNumbers', updateNumbers);
+        // 管理者モード切り替え関数
+        function toggleAdminMode() {
+            isAdmin = !isAdmin;
+            updateNumbers(); // 管理者モード切り替え後に数字を再描画
+        }
+    
+        // 初期化（最初に数字を表示）
+        updateNumbers();
     </script>
 </body>
-
 </html>
