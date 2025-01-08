@@ -193,6 +193,9 @@
 
 </head>
 <body>
+    <script>
+        let isAdmin = false; // Declare and initialize `isAdmin` globally
+    </script>
     <div id="main-container">
         <div id="current-number">
             <div id="currentNumberDisplay" class="number">--</div>
@@ -217,7 +220,18 @@
         <button onclick="checkPassword()">確認</button>
         <button onclick="closePasswordPopup()">閉じる</button>
     </div>
-        <script>
+    <script>
+        // Ensure `addEventListener` instead of inline handlers
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('admin-button').addEventListener('click', showPasswordPopup);
+        
+            // Example: Hook close password popup
+            const closePasswordPopupButton = document.querySelector('#password-popup button:last-of-type');
+            if (closePasswordPopupButton) {
+                closePasswordPopupButton.addEventListener('click', closePasswordPopup);
+            }
+        });
+
         const socket = io();
         // Server-side: Listen for 'newNumber' and update numbers list
         let numbers = []; // Maintain the list of numbers on the server
@@ -312,9 +326,15 @@
         }
         // ポップアップを閉じる関数
         function closePopup() {
+            console.log('Closing popup...');
+            console.log('Overlay:', document.getElementById('overlay'));
+            console.log('Popup:', document.getElementById('popup'));
+        
             document.getElementById('overlay').style.display = 'none';
             document.getElementById('popup').style.display = 'none';
+            editingIndex = null;
         }
+            
         // 新しい番号を送信する関数
         function sendNumber() {
             const newNumberInput = document.getElementById('newNumber');
