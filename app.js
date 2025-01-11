@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
     updateHistoryGrid();
   };
 
-    // 最新の数字を表示
+  // 最新の数字を表示
   const displayNumber = (number) => {
     numberBox.textContent = number || "--";
     numberBox.style.backgroundColor = number ? getColumnColor(number) : "#e3e3e3";
@@ -59,9 +59,9 @@ document.addEventListener("DOMContentLoaded", () => {
       numberElement.textContent = usedNumbers[i] || "";
       numberElement.style.backgroundColor = usedNumbers[i] ? getColumnColor(usedNumbers[i]) : "transparent";
       numberElement.style.border = usedNumbers[i] ? "2px solid black" : "none"; // 黒枠を追加
-      numberElement.style.boxShadow = usedNumbers[i] ? "0 2px 4px rgba(0, 0, 0, 0.2)" : "none"; // 影を削除
       numberElement.style.width = "75px";  // 各グリッドの幅
       numberElement.style.height = "75px"; // 各グリッドの高さ
+      numberElement.style.boxShadow = usedNumbers[i] ? "0 2px 4px rgba(0, 0, 0, 0.2)" : "none"; // 影を削除
       numberElement.addEventListener("click", () => {
         if (isAdmin && usedNumbers[i]) {
           selectedNumberLabel.textContent = `選択した数字: ${usedNumbers[i]}`;
