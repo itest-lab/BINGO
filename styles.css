@@ -33,41 +33,55 @@ header button:hover {
   background-color: #0056b3;
 }
 
-#latest-number {
-  font-size: 48px;
-  margin: 20px 0;
-}
-
-#history {
-  margin: 20px 0;
-}
-
-#number-history {
-  list-style: none;
-  padding: 0;
+/* コンテナ */
+#container {
   display: flex;
-  flex-wrap: wrap;
+  justify-content: space-between;
+  width: 80%;
+  margin: 20px auto;
+}
+
+/* 過去の数字 */
+#history {
+  flex: 2;
+  margin-right: 20px;
+}
+
+#number-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
   gap: 10px;
 }
 
-#number-history li {
-  padding: 10px;
-  background-color: #e3e3e3;
-  border-radius: 5px;
+.number-cell {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 18px;
   font-weight: bold;
-}
-
-button {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 10px 20px;
   border-radius: 5px;
   cursor: pointer;
+  background-color: #e3e3e3;
 }
 
-button:hover {
-  background-color: #0056b3;
+.number-cell[data-column="B"] { background-color: #add8e6; } /* 青 */
+.number-cell[data-column="I"] { background-color: #f08080; } /* 赤 */
+.number-cell[data-column="N"] { background-color: #90ee90; } /* 緑 */
+.number-cell[data-column="G"] { background-color: #ffd700; } /* 黄 */
+.number-cell[data-column="O"] { background-color: #dda0dd; } /* 紫 */
+
+/* 最新の数字 */
+#latest-number {
+  flex: 1;
+  text-align: center;
+}
+
+#current-number {
+  font-size: 96px;
+  font-weight: bold;
+  margin: 20px 0;
 }
 
 /* ポップアップ */
