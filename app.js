@@ -18,6 +18,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const alertPopup = document.getElementById("alert-popup");
   const alertMessage = document.getElementById("alert-message");
   const closeAlertPopup = document.getElementById("close-alert-popup");
+  const resetConfirmPopup = document.getElementById("reset-confirm-popup");
+  const confirmResetBtn = document.getElementById("confirm-reset-btn");
+  const cancelResetBtn = document.getElementById("cancel-reset-btn");
 
   const db = firebase.database();
   let isAdmin = false;
@@ -120,6 +123,28 @@ document.addEventListener("DOMContentLoaded", () => {
     alertPopup.style.display = "none";
   });
 
+  // リセットボタンを押した際の確認ポップアップを表示
+  resetBtn.addEventListener("click", () => {
+    resetConfirmPopup.style.display = "flex";
+  });
+
+  // リセット確認ポップアップで「はい」を押した場合
+  confirmResetBtn.addEventListener("click", () => {
+    usedNumbers = [];
+    firebase.database().ref("bingo").set({
+      latestNumber: null,
+      history: [],
+    });
+    displayNumber(null);
+    updateHistoryGrid();
+    resetConfirmPopup.style.display = "none";
+  });
+
+  // リセット確認ポップアップで「いいえ」を押した場合
+  cancelResetBtn.addEventListener("click", () => {
+    resetConfirmPopup.style.display = "none";
+  });
+
   // ランダムスタート
   startBtn.addEventListener("click", () => {
     if (usedNumbers.length >= 75) {
@@ -154,69 +179,80 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 2000);
   });
 
-  // 手動入力
-  manualBtn.addEventListener("click", () => {
-    const manualNumber = prompt("数字を入力してください (1～75):");
-    if (manualNumber === null) {
-      return; // キャンセルが押された場合、何もしない
-    }
-    const number = parseInt(manualNumber);
-    if (!number || number < 1 || number > 75 || usedNumbers.includes(number)) {
-      showAlert("1～75の間の数字を入力するか、すでに使用されている数字は入力できません。");
-      return;
-    }
-    updateNumber(number);
+// 手動入力
+manualBtn.addEventListener("click", () => {
+  const manualNumber = prompt("数字を入力してください (1～75):");
+  if (manualNumber === null) {
+    return; // キャンセルが押された場合、何もしない
+  }
+  const number = parseInt(manualNumber);
+  if (!number || number < 1 || number > 75 || usedNumbers.includes(number)) {
+    showAlert("1～75の間の数字を入力するか、すでに使用されている数字は入力できません。");
+    return;
+  }
+  updateNumber(number);
+});
+
+// リセットボタンを押した際の確認ポップアップを表示
+resetBtn.addEventListener("click", () => {
+  resetConfirmPopup.style.display = "flex";
+});
+
+// リセット確認ポップアップで「はい」を押した場合
+confirmResetBtn.addEventListener("click", () => {
+  usedNumbers = [];
+  firebase.database().ref("bingo").set({
+    latestNumber: null,
+    history: [],
+  });
+  displayNumber(null);
+  updateHistoryGrid();
+  resetConfirmPopup.style.display = "none";
+});
+
+// リセット確認ポップアップで「いいえ」を押した場合
+cancelResetBtn.addEventListener("click", () => {
+  resetConfirmPopup.style.display = "none";
+});
+
+// Firebaseから最新の数字をリアルタイムで取得
+firebase.database().ref("bingo/latestNumber").on("value", (snapshot) => {
+  const latestNumber = snapshot.val();
+  displayNumber(latestNumber);
+});
+
+// Firebaseから過去の数字をリアルタイムで取得
+firebase.database().ref("bingo/history").on("value", (snapshot) => {
+  usedNumbers = snapshot.val() || [];
+  updateHistoryGrid();
+});
+
+// 過去の数字をクリックして編集
+editSubmit.addEventListener("click", () => {
+  const newNumber = parseInt(editNumberInput.value);
+  if (!newNumber || newNumber < 1 || newNumber > 75 || usedNumbers.includes(newNumber)) {
+    showAlert("1～75の間の数字を入力するか、すでに使用されている数字は入力できません。");
+    return;
+  }
+
+  const oldNumber = parseInt(selectedNumberLabel.textContent.replace("選択した数字: ", ""));
+  const index = usedNumbers.indexOf(oldNumber);
+  if (index > -1) {
+    usedNumbers[index] = newNumber;
+    usedNumbers[0] = newNumber; // 最新の数字も変更
+  }
+
+  firebase.database().ref("bingo").update({
+    latestNumber: newNumber,
+    history: usedNumbers,
   });
 
-  // リセット
-  resetBtn.addEventListener("click", () => {
-    usedNumbers = [];
-    firebase.database().ref("bingo").set({
-      latestNumber: null,
-      history: [],
-    });
-    displayNumber(null);
-    updateHistoryGrid();
-  });
+  editPopup.style.display = "none";
+  updateHistoryGrid();
+  displayNumber(newNumber); // 最新の数字を更新して表示
+});
 
-  // Firebaseから最新の数字をリアルタイムで取得
-  firebase.database().ref("bingo/latestNumber").on("value", (snapshot) => {
-    const latestNumber = snapshot.val();
-    displayNumber(latestNumber);
-  });
-
-  // Firebaseから過去の数字をリアルタイムで取得
-  firebase.database().ref("bingo/history").on("value", (snapshot) => {
-    usedNumbers = snapshot.val() || [];
-    updateHistoryGrid();
-  });
-
-  // 過去の数字をクリックして編集
-  editSubmit.addEventListener("click", () => {
-    const newNumber = parseInt(editNumberInput.value);
-    if (!newNumber || newNumber < 1 || newNumber > 75 || usedNumbers.includes(newNumber)) {
-      showAlert("1～75の間の数字を入力するか、すでに使用されている数字は入力できません。");
-      return;
-    }
-
-    const oldNumber = parseInt(selectedNumberLabel.textContent.replace("選択した数字: ", ""));
-    const index = usedNumbers.indexOf(oldNumber);
-    if (index > -1) {
-      usedNumbers[index] = newNumber;
-      usedNumbers[0] = newNumber; // 最新の数字も変更
-    }
-
-    firebase.database().ref("bingo").update({
-      latestNumber: newNumber,
-      history: usedNumbers,
-    });
-
-    editPopup.style.display = "none";
-    updateHistoryGrid();
-    displayNumber(newNumber); // 最新の数字を更新して表示
-  });
-
-  closeAlertPopup.addEventListener("click", () => {
-    alertPopup.style.display = "none";
-  });
+// アラートポップアップを閉じる
+closeAlertPopup.addEventListener("click", () => {
+  alertPopup.style.display = "none";
 });
