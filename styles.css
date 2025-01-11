@@ -39,7 +39,7 @@ header button:hover {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: calc(100vh - 200px); /* ヘッダーとフッターを除いた高さ */
+  height: calc(100vh - 100px); /* ヘッダーとフッターを除いた高さ */
   width: 100%;
   padding: 20px;
 }
@@ -50,21 +50,21 @@ header button:hover {
   flex-direction: column;
   align-items: center;
   flex: 1;
-  max-width: 700px; /* 新しいサイズ */
-  margin-right: 10px; /* 左側にずらす */
+  max-width: 700px;
+  margin-right: 10px;
 }
 
 #number-box {
-  width: 700px; /* 新しいサイズ */
-  height: 700px; /* 新しいサイズ */
+  width: 700px;
+  height: 700px;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 450px; /* 新しいサイズ */
+  font-size: 450px;
   font-weight: bold;
   border-radius: 10px;
   background-color: #e3e3e3;
-  border: 2px solid black; /* 黒枠を追加 */
+  border: 2px solid black;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   transition: background-color 0.3s ease;
 }
@@ -108,21 +108,23 @@ header button:hover {
   grid-template-rows: repeat(7, 1fr);
   gap: 10px; /* 数字間のスペース */
   width: 100%;
+  width: 75px;
+  height: 75px;
 }
 
 .history-number {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 75px; /* 新しいサイズ */
-  height: 75px; /* 新しいサイズ */
-  font-size: 50px; /* 新しいサイズ */
+  width: 75px;
+  height: 75px;
+  font-size: 50px;
   font-weight: bold;
   background-color: #e3e3e3;
   border-radius: 5px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  border: 2px solid black; /* 黒枠を追加 */
-  cursor: pointer; /* ボタンのように見せるためのスタイル */
+  border: 2px solid black;
+  cursor: pointer;
 }
 
 /* ポップアップ */
