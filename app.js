@@ -104,27 +104,25 @@ document.addEventListener("DOMContentLoaded", () => {
     updateNumber(number);
   });
 
-  // リセット
-  // リセット
-  resetBtn.addEventListener("click", () => {
-    usedNumbers = [];
-    firebase.database().ref("bingo").set({
-      latestNumber: null,
-      history: [],
-    });
-    displayNumber(null);
-    updateHistoryGrid();
+// リセット
+resetBtn.addEventListener("click", () => {
+  usedNumbers = [];
+  firebase.database().ref("bingo").set({
+    latestNumber: null,
+    history: [],
   });
+  displayNumber(null);
+  updateHistoryGrid();
+});
 
-  // Firebaseから最新の数字をリアルタイムで取得
-  firebase.database().ref("bingo/latestNumber").on("value", (snapshot) => {
-    const latestNumber = snapshot.val();
-    displayNumber(latestNumber);
-  });
+// Firebaseから最新の数字をリアルタイムで取得
+firebase.database().ref("bingo/latestNumber").on("value", (snapshot) => {
+  const latestNumber = snapshot.val();
+  displayNumber(latestNumber);
+});
 
-  // Firebaseから過去の数字をリアルタイムで取得
-  firebase.database().ref("bingo/history").on("value", (snapshot) => {
-    usedNumbers = snapshot.val() || [];
-    updateHistoryGrid();
-  });
+// Firebaseから過去の数字をリアルタイムで取得
+firebase.database().ref("bingo/history").on("value", (snapshot) => {
+  usedNumbers = snapshot.val() || [];
+  updateHistoryGrid();
 });
