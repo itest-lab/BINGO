@@ -61,13 +61,13 @@ document.addEventListener("DOMContentLoaded", () => {
     adminPopup.style.display = "flex";
   });
 
-  // 管理者ログイン処理
+    // 管理者ログイン処理
   adminLoginSubmit.addEventListener("click", () => {
     const password = adminPasswordInput.value;
     if (password === "admin123") {
       alert("管理者ログイン成功！");
       isAdmin = true;
-      controls.style.display = "block";
+      controls.style.display = "flex"; // フッターに表示
       adminPopup.style.display = "none";
     } else {
       alert("パスワードが間違っています！");
@@ -77,6 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
   closePopupBtn.addEventListener("click", () => {
     adminPopup.style.display = "none";
   });
+
   // ランダムスタート
   startBtn.addEventListener("click", () => {
     if (usedNumbers.length >= 75) {
@@ -89,7 +90,15 @@ document.addEventListener("DOMContentLoaded", () => {
       randomNumber = Math.floor(Math.random() * 75) + 1;
     } while (usedNumbers.includes(randomNumber));
 
-    updateNumber(randomNumber);
+    // 数字がランダムに点滅
+    let flashInterval = setInterval(() => {
+      numberBox.textContent = Math.floor(Math.random() * 75) + 1;
+    }, 100);
+
+    setTimeout(() => {
+      clearInterval(flashInterval);
+      updateNumber(randomNumber);
+    }, 2000);
   });
 
   // 手動入力
@@ -124,5 +133,29 @@ document.addEventListener("DOMContentLoaded", () => {
   firebase.database().ref("bingo/history").on("value", (snapshot) => {
     usedNumbers = snapshot.val() || [];
     updateHistoryGrid();
+  });
+
+  // 過去の数字をクリックして編集
+  historyGrid.addEventListener("click", (event) => {
+    const target = event.target;
+    if (target.classList.contains("history-number")) {
+      const newNumber = prompt("新しい数字を入力してください:", target.textContent);
+      const number = parseInt(newNumber);
+      if (!number || number < 1 || number > 75) {
+        alert("1～75の間の数字を入力してください。");
+        return;
+      }
+
+      const index = usedNumbers.indexOf(parseInt(target.textContent));
+      if (index > -1) {
+        usedNumbers[index] = number;
+      }
+
+      firebase.database().ref("bingo").update({
+        history: usedNumbers,
+      });
+
+      updateHistoryGrid();
+    }
   });
 });
