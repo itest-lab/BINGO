@@ -49,16 +49,16 @@ header button:hover {
   flex-direction: column;
   align-items: center;
   flex: 1;
-  max-width: 500px;
+  max-width: 1000px;
 }
 
 #number-box {
-  width: 500px;
-  height: 500px;
+  width: 1000px;
+  height: 1000px;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 120px;
+  font-size: 240px;
   font-weight: bold;
   border-radius: 10px;
   background-color: #e3e3e3;
