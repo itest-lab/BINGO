@@ -63,6 +63,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const numberElement = document.createElement("div");
       numberElement.className = "history-number";
       numberElement.textContent = usedNumbers[i] || "--";
+      numberElement.style.width = "75px";  // 各グリッドの幅
+      numberElement.style.height = "75px"; // 各グリッドの高さ
       numberElement.style.backgroundColor = usedNumbers[i] ? getColumnColor(usedNumbers[i]) : "#e3e3e3";
       numberElement.style.border = "2px solid black"; // 黒枠を追加
       numberElement.addEventListener("click", () => {
@@ -89,7 +91,6 @@ document.addEventListener("DOMContentLoaded", () => {
       isAdmin = true;
       controls.style.display = "flex"; // フッターに表示
       controls.style.left = "50px"; // 左端から50px空ける
-      controls.style.top = "50px"; // 上端から50px空ける
       adminPopup.style.display = "none";
     } else {
       alert("パスワードが間違っています！");
