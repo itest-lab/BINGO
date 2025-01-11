@@ -2,21 +2,19 @@
 body {
   font-family: Arial, sans-serif;
   margin: 0;
-  padding: 0;
+  padding: 20px 0; /* 全体的に下げる */
   background-color: #ffffff; /* 背景色を白に変更 */
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-/* ヘッダーなしに修正 */
-
 /* 最新の数字 */
 #main-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: calc(100vh - 200px); /* ヘッダーとフッターを除いた高さ */
+  height: calc(100vh - 150px); /* ヘッダーとフッターを除いた高さ */
   width: 100%;
   padding: 20px;
 }
@@ -54,11 +52,12 @@ body {
   padding: 10px;
   background-color: white; /* 背景色を白に変更 */
   border-top: none; /* フッターの枠を消す */
+  height: 50px; /* フッターを半分にする */
 }
 
 #controls button {
   margin: 0 10px;
-  padding: 10px 20px;
+  padding: 5px 10px; /* ボタンのサイズも調整 */
   border: none;
   border-radius: 5px;
   background-color: #007bff;
