@@ -120,3 +120,19 @@ body {
   text-align: center;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
+
+#manual-popup .popup-content {
+  text-align: center;
+}
+
+#manual-popup label {
+  margin-bottom: 10px;
+}
+
+#manual-popup input[type="number"] {
+  margin-bottom: 20px;
+}
+
+#manual-popup button {
+  margin-left: 10px;
+}
