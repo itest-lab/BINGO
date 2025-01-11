@@ -21,12 +21,6 @@ document.addEventListener("DOMContentLoaded", () => {
   let usedNumbers = [];
   let currentNumber = null;
 
-  // 画面サイズを取得
-  const screenSize = {
-    width: window.innerWidth,
-    height: window.innerHeight
-  };
-
   // 数字の列に応じた色を取得
   const getColumnColor = (number) => {
     if (number <= 15) return "#add8e6"; // B (青)
