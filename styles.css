@@ -146,3 +146,15 @@ body {
 #alert-popup p {
   margin: 20px 0;
 }
+
+#reset-confirm-popup .popup-content {
+  text-align: center;
+}
+
+#reset-confirm-popup p {
+  margin: 20px 0;
+}
+
+#reset-confirm-popup button {
+  margin: 10px;
+}
