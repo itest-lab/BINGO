@@ -25,34 +25,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const manualNumberInput = document.getElementById("manual-number-input");
   const manualSubmit = document.getElementById("manual-submit");
   const closeManualPopup = document.getElementById("close-manual-popup");
-
-  // Firebaseから最新の数字をリアルタイムで取得
-  firebase.database().ref("bingo/latestNumber").on("value", (snapshot) => {
-    const latestNumber = snapshot.val();
-    if (latestNumber !== null) {
-      flashNumber(latestNumber);
-    }
-  });
-
-  // 数字がランダムに点滅し、最終的に最新の数字を表示
-  const flashNumber = (latestNumber) => {
-    let flashInterval = setInterval(() => {
-      numberBox.textContent = Math.floor(Math.random() * 75) + 1;
-      numberBox.style.backgroundColor = "white";
-    }, 100);
-
-    // 2秒後に停止して最新の数字を表示
-    setTimeout(() => {
-      clearInterval(flashInterval);
-      displayNumber(latestNumber);
-    }, 2000);
-  };
-
-  // 最新の数字を表示する関数（参加者側）
-  const displayNumber = (number) => {
-    numberBox.textContent = number || "--";
-    numberBox.style.backgroundColor = number ? getColumnColor(number) : "#e3e3e3";
-  };
   
   const db = firebase.database();
   let isAdmin = false;
@@ -91,6 +63,28 @@ document.addEventListener("DOMContentLoaded", () => {
     updateHistoryGrid();
   };
 
+  // Firebaseから最新の数字をリアルタイムで取得
+  firebase.database().ref("bingo/latestNumber").on("value", (snapshot) => {
+    const latestNumber = snapshot.val();
+    if (latestNumber !== null) {
+      flashNumber(latestNumber);
+    }
+  });
+
+  // 数字がランダムに点滅し、最終的に最新の数字を表示
+  const flashNumber = (latestNumber) => {
+    let flashInterval = setInterval(() => {
+      numberBox.textContent = Math.floor(Math.random() * 75) + 1;
+      numberBox.style.backgroundColor = "white";
+    }, 100);
+
+    // 2秒後に停止して最新の数字を表示
+    setTimeout(() => {
+      clearInterval(flashInterval);
+      displayNumber(latestNumber);
+    }, 2000);
+  };
+  
   // 最新の数字を表示
   const displayNumber = (number) => {
     numberBox.textContent = number || "--";
