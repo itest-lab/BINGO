@@ -23,67 +23,7 @@
       </div>
     </main>
     
-    <footer id="controls" style="display:flex; justify-content: left;">
-      <button id="admin-login-btn">管理者ログイン</button>
-      <button id="start-btn" style="display:none;">ランダムスタート</button>
-      <button id="manual-btn" style="display:none;">手動入力</button>
-      <button id="reset-btn" style="display:none;">リセット</button>
-    </footer>
-    
-    <!-- 数字編集ポップアップ -->
-    <div id="edit-popup" class="popup" style="display:none;">
-      <div class="popup-content">
-        <h2>数字編集</h2>
-        <label id="selected-number-label">選択した数字: </label>
-        <input type="number" id="edit-number-input" min="1" max="75">
-        <button id="edit-submit">変更</button>
-        <button id="close-edit-popup">閉じる</button>
-      </div>
-    </div>
-
-    <!-- 管理者ログインポップアップ -->
-    <div id="admin-popup" class="popup" style="display:none;">
-      <div class="popup-content">
-        <h2>管理者ログイン</h2>
-        <label for="admin-password">パスワード:</label>
-        <input type="password" id="admin-password">
-        <button id="admin-login-submit">ログイン</button>
-        <button id="close-popup">閉じる</button>
-      </div>
-    </div>
-
-  </div>
-
-  <script src="firebase-config.js"></script>
-  <script src="app.js"></script>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ビンゴゲーム</title>
-  <link rel="stylesheet" href="styles.css">
-  <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-database-compat.js"></script>
-</head>
-<body>
-  <div id="app">
-    <main>
-      <div id="main-container">
-        <!-- 最新の数字 -->
-        <div id="latest-number">
-          <div id="number-box">--</div>
-        </div>
-        <!-- 過去の数字 -->
-        <div id="history-container">
-          <div id="history-grid"></div>
-        </div>
-      </div>
-    </main>
-    
-    <footer id="controls" style="display:flex; justify-content: left;">
+    <footer id="controls" style="display:flex; justify-content: left; background-color: white;">
       <button id="admin-login-btn">管理者ログイン</button>
       <button id="start-btn" style="display:none;">ランダムスタート</button>
       <button id="manual-btn" style="display:none;">手動入力</button>
