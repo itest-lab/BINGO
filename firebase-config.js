@@ -10,6 +10,8 @@ const firebaseConfig = {
   measurementId: "G-QJJ73C5KBX"
 };
 
-// Firebaseアプリの初期化
-const app = firebase.initializeApp(firebaseConfig);
-const database = firebase.getDatabase(app);
+// Firebaseアプリを初期化
+firebase.initializeApp(firebaseConfig);
+
+// Realtime Databaseの参照を取得
+const database = firebase.database();
