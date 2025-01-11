@@ -69,8 +69,17 @@ header button:hover {
 }
 
 /* 管理者コントロール */
+#controls {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+  background-color: white;
+  border-top: 1px solid #ccc;
+}
+
 #controls button {
-  margin: 10px;
+  margin: 0 10px;
   padding: 10px 20px;
   border: none;
   border-radius: 5px;
@@ -111,6 +120,7 @@ header button:hover {
   border-radius: 5px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   border: 2px solid black; /* 黒枠を追加 */
+  cursor: pointer; /* ボタンのように見せるためのスタイル */
 }
 
 /* ポップアップ */
