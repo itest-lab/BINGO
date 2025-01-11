@@ -1,45 +1,41 @@
 body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  margin: 0;
-  font-family: Arial, sans-serif;
   background-color: #f7f7f7;
 }
 
-#container {
-  display: flex;
-  width: 80%;
-  height: 80%;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+#app {
+  text-align: center;
+  width: 100%;
+  max-width: 600px;
 }
 
-#current-number, #past-numbers {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  background-color: #fff;
-}
-
-#controls {
-  flex: 0.5;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  background-color: #ececec;
-}
-
-button {
-  margin: 10px;
-  padding: 10px 20px;
-  font-size: 16px;
-}
-
-#history {
+#bingo-board {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
   margin-top: 20px;
-  font-size: 18px;
 }
+
+.bingo-cell {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #e3e3e3;
+  font-size: 20px;
+  font-weight: bold;
+  border-radius: 5px;
+}
+
+.bingo-cell[data-column="B"] { background-color: #add8e6; } /* 青 */
+.bingo-cell[data-column="I"] { background-color: #f08080; } /* 赤 */
+.bingo-cell[data-column="N"] { background-color: #90ee90; } /* 緑 */
+.bingo-cell[data-column="G"] { background-color: #ffd700; } /* 黄 */
+.bingo-cell[data-column="O"] { background-color: #dda0dd; } /* 紫 */
