@@ -1,26 +1,18 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const loginScreen = document.getElementById("login-screen");
-  const gameScreen = document.getElementById("game-screen");
-  const loginBtn = document.getElementById("login-btn");
-  const passwordInput = document.getElementById("password");
   const bingoBoard = document.getElementById("bingo-board");
+  const controls = document.getElementById("controls");
+  const adminLoginBtn = document.getElementById("admin-login-btn");
+  const adminPopup = document.getElementById("admin-popup");
+  const adminPasswordInput = document.getElementById("admin-password");
+  const adminLoginSubmit = document.getElementById("admin-login-submit");
+  const closePopupBtn = document.getElementById("close-popup");
   const submitNumberBtn = document.getElementById("submit-number");
   const randomStartBtn = document.getElementById("random-start");
   const numberInput = document.getElementById("number-input");
   const currentNumberDisplay = document.getElementById("current-number");
 
   const db = firebase.database();
-
-  // ログイン処理
-  loginBtn.addEventListener("click", () => {
-    const password = passwordInput.value;
-    if (password === "admin123") { // 簡易的な管理者認証
-      loginScreen.style.display = "none";
-      gameScreen.style.display = "block";
-    } else {
-      alert("パスワードが間違っています！");
-    }
-  });
+  let isAdmin = false;
 
   // ビンゴボードを生成
   const createBingoBoard = () => {
@@ -36,6 +28,29 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   createBingoBoard();
+
+  // 管理者ログインポップアップを開く
+  adminLoginBtn.addEventListener("click", () => {
+    adminPopup.style.display = "flex";
+  });
+
+  // 管理者ログイン処理
+  adminLoginSubmit.addEventListener("click", () => {
+    const password = adminPasswordInput.value;
+    if (password === "1111") { // 管理者パスワード
+      alert("管理者ログイン成功！");
+      isAdmin = true;
+      controls.style.display = "block"; // 操作パネルを有効化
+      adminPopup.style.display = "none";
+    } else {
+      alert("パスワードが間違っています！");
+    }
+  });
+
+  // ポップアップを閉じる
+  closePopupBtn.addEventListener("click", () => {
+    adminPopup.style.display = "none";
+  });
 
   // 数字送信
   submitNumberBtn.addEventListener("click", () => {
