@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const resetBtn = document.getElementById("reset-btn");
   const numberBox = document.getElementById("number-box");
   const controls = document.getElementById("controls");
+  const historyGrid = document.getElementById("history-grid");
 
   const db = firebase.database();
   let isAdmin = false;
@@ -34,12 +35,25 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     displayNumber(number);
+    updateHistoryGrid();
   };
 
   // 最新の数字を表示
   const displayNumber = (number) => {
     numberBox.textContent = number || "--";
     numberBox.style.backgroundColor = number ? getColumnColor(number) : "#e3e3e3";
+  };
+
+  // 過去の数字を表示
+  const updateHistoryGrid = () => {
+    historyGrid.innerHTML = "";
+    usedNumbers.forEach((number) => {
+      const numberElement = document.createElement("div");
+      numberElement.className = "history-number";
+      numberElement.textContent = number;
+      numberElement.style.backgroundColor = getColumnColor(number);
+      historyGrid.appendChild(numberElement);
+    });
   };
 
   // 管理者ログインポップアップを開く
@@ -91,6 +105,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // リセット
+  // リセット
   resetBtn.addEventListener("click", () => {
     usedNumbers = [];
     firebase.database().ref("bingo").set({
@@ -98,11 +113,18 @@ document.addEventListener("DOMContentLoaded", () => {
       history: [],
     });
     displayNumber(null);
+    updateHistoryGrid();
   });
 
   // Firebaseから最新の数字をリアルタイムで取得
   firebase.database().ref("bingo/latestNumber").on("value", (snapshot) => {
     const latestNumber = snapshot.val();
     displayNumber(latestNumber);
+  });
+
+  // Firebaseから過去の数字をリアルタイムで取得
+  firebase.database().ref("bingo/history").on("value", (snapshot) => {
+    usedNumbers = snapshot.val() || [];
+    updateHistoryGrid();
   });
 });
