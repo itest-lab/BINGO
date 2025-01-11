@@ -32,16 +32,16 @@
       <button id="manual-btn">手動入力</button>
       <button id="reset-btn">リセット</button>
     </footer>
-  </div>
-
-  <!-- 管理者ログインポップアップ -->
-  <div id="admin-popup" class="popup" style="display:none;">
-    <div class="popup-content">
-      <h2>管理者ログイン</h2>
-      <label for="admin-password">パスワード:</label>
-      <input type="password" id="admin-password">
-      <button id="admin-login-submit">ログイン</button>
-      <button id="close-popup">閉じる</button>
+    
+    <!-- 数字編集ポップアップ -->
+    <div id="edit-popup" class="popup" style="display:none;">
+      <div class="popup-content">
+        <h2>数字編集</h2>
+        <label id="selected-number-label">選択した数字: </label>
+        <input type="number" id="edit-number-input" min="1" max="75">
+        <button id="edit-submit">変更</button>
+        <button id="close-edit-popup">閉じる</button>
+      </div>
     </div>
   </div>
 
