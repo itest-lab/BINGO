@@ -13,8 +13,9 @@ header {
   width: 100%;
   text-align: center;
   padding: 10px;
-  background-color: #444;
+  background-color: white; /* ヘッダーの背景色を白に変更 */
   color: white;
+  position: relative;
 }
 
 header button {
@@ -24,6 +25,8 @@ header button {
   padding: 10px 20px;
   border-radius: 5px;
   cursor: pointer;
+  position: absolute;
+  left: 20px; /* 左の画面端から20px空ける */
 }
 
 header button:hover {
@@ -92,9 +95,8 @@ header button:hover {
   display: grid;
   grid-template-columns: repeat(10, 1fr);
   grid-template-rows: repeat(7, 1fr);
-  gap: 5px; /* 数字間のスペース */
+  gap: 10px; /* 数字間のスペース */
   width: 100%;
-  gap: 10px; /* 最新の数字とのスペース */
 }
 
 .history-number {
@@ -108,6 +110,7 @@ header button:hover {
   background-color: #e3e3e3;
   border-radius: 5px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  border: 2px solid black; /* 黒枠を追加 */
 }
 
 /* ポップアップ */
