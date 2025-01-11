@@ -140,6 +140,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // 手動入力
   manualBtn.addEventListener("click", () => {
     const manualNumber = prompt("数字を入力してください (1～75):");
+    if (manualNumber === null) {
+      return; // キャンセルが押された場合、何もしない
+    }
     const number = parseInt(manualNumber);
     if (!number || number < 1 || number > 75 || usedNumbers.includes(number)) {
       alert("1～75の間の数字を入力するか、すでに使用されている数字は入力できません。");
