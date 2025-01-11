@@ -59,7 +59,7 @@ header button:hover {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 280px; /* 新しいサイズ */
+  font-size: 450px; /* 新しいサイズ */
   font-weight: bold;
   border-radius: 10px;
   background-color: #e3e3e3;
@@ -105,7 +105,7 @@ header button:hover {
   align-items: center;
   width: 75px; /* 新しいサイズ */
   height: 75px; /* 新しいサイズ */
-  font-size: 30px; /* 新しいサイズ */
+  font-size: 50px; /* 新しいサイズ */
   font-weight: bold;
   background-color: #e3e3e3;
   border-radius: 5px;
