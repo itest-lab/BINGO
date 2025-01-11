@@ -21,6 +21,12 @@ document.addEventListener("DOMContentLoaded", () => {
   let usedNumbers = [];
   let currentNumber = null;
 
+  // 画面サイズを取得
+  const screenSize = {
+    width: window.innerWidth,
+    height: window.innerHeight
+  };
+
   // 数字の列に応じた色を取得
   const getColumnColor = (number) => {
     if (number <= 15) return "#add8e6"; // B (青)
@@ -53,21 +59,21 @@ document.addEventListener("DOMContentLoaded", () => {
   // 過去の数字を表示
   const updateHistoryGrid = () => {
     historyGrid.innerHTML = "";
-    usedNumbers.forEach((number) => {
+    for (let i = 0; i < 70; i++) {
       const numberElement = document.createElement("div");
       numberElement.className = "history-number";
-      numberElement.textContent = number;
-      numberElement.style.backgroundColor = getColumnColor(number);
+      numberElement.textContent = usedNumbers[i] || "--";
+      numberElement.style.backgroundColor = usedNumbers[i] ? getColumnColor(usedNumbers[i]) : "#e3e3e3";
       numberElement.style.border = "2px solid black"; // 黒枠を追加
       numberElement.addEventListener("click", () => {
-        if (isAdmin) {
-          selectedNumberLabel.textContent = `選択した数字: ${number}`;
-          editNumberInput.value = number;
+        if (isAdmin && usedNumbers[i]) {
+          selectedNumberLabel.textContent = `選択した数字: ${usedNumbers[i]}`;
+          editNumberInput.value = usedNumbers[i];
           editPopup.style.display = "flex";
         }
       });
       historyGrid.appendChild(numberElement);
-    });
+    }
   };
 
   // 管理者ログインポップアップを開く
@@ -82,6 +88,8 @@ document.addEventListener("DOMContentLoaded", () => {
       alert("管理者ログイン成功！");
       isAdmin = true;
       controls.style.display = "flex"; // フッターに表示
+      controls.style.left = "50px"; // 左端から50px空ける
+      controls.style.top = "50px"; // 上端から50px空ける
       adminPopup.style.display = "none";
     } else {
       alert("パスワードが間違っています！");
@@ -135,8 +143,8 @@ document.addEventListener("DOMContentLoaded", () => {
   manualBtn.addEventListener("click", () => {
     const manualNumber = prompt("数字を入力してください (1～75):");
     const number = parseInt(manualNumber);
-    if (!number || number < 1 || number > 75) {
-      alert("1～75の間の数字を入力してください。");
+    if (!number || number < 1 || number > 75 || usedNumbers.includes(number)) {
+      alert("1～75の間の数字を入力するか、すでに使用されている数字は入力できません。");
       return;
     }
     updateNumber(number);
