@@ -10,10 +10,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const numberBox = document.getElementById("number-box");
   const controls = document.getElementById("controls");
   const historyGrid = document.getElementById("history-grid");
+  const editPopup = document.getElementById("edit-popup");
+  const editNumberInput = document.getElementById("edit-number-input");
+  const editSubmit = document.getElementById("edit-submit");
+  const closeEditPopup = document.getElementById("close-edit-popup");
+  const selectedNumberLabel = document.getElementById("selected-number-label");
 
   const db = firebase.database();
   let isAdmin = false;
   let usedNumbers = [];
+  let currentNumber = null;
 
   // 数字の列に応じた色を取得
   const getColumnColor = (number) => {
@@ -52,6 +58,14 @@ document.addEventListener("DOMContentLoaded", () => {
       numberElement.className = "history-number";
       numberElement.textContent = number;
       numberElement.style.backgroundColor = getColumnColor(number);
+      numberElement.style.border = "2px solid black"; // 黒枠を追加
+      numberElement.addEventListener("click", () => {
+        if (isAdmin) {
+          selectedNumberLabel.textContent = `選択した数字: ${number}`;
+          editNumberInput.value = number;
+          editPopup.style.display = "flex";
+        }
+      });
       historyGrid.appendChild(numberElement);
     });
   };
@@ -61,7 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
     adminPopup.style.display = "flex";
   });
 
-    // 管理者ログイン処理
+  // 管理者ログイン処理
   adminLoginSubmit.addEventListener("click", () => {
     const password = adminPasswordInput.value;
     if (password === "admin123") {
@@ -78,6 +92,11 @@ document.addEventListener("DOMContentLoaded", () => {
     adminPopup.style.display = "none";
   });
 
+  // 数字編集ポップアップを閉じる
+  closeEditPopup.addEventListener("click", () => {
+    editPopup.style.display = "none";
+  });
+
   // ランダムスタート
   startBtn.addEventListener("click", () => {
     if (usedNumbers.length >= 75) {
@@ -90,14 +109,25 @@ document.addEventListener("DOMContentLoaded", () => {
       randomNumber = Math.floor(Math.random() * 75) + 1;
     } while (usedNumbers.includes(randomNumber));
 
+    // ボタンを無効化
+    startBtn.disabled = true;
+    manualBtn.disabled = true;
+    resetBtn.disabled = true;
+
     // 数字がランダムに点滅
     let flashInterval = setInterval(() => {
       numberBox.textContent = Math.floor(Math.random() * 75) + 1;
+      numberBox.style.backgroundColor = "white";
     }, 100);
 
     setTimeout(() => {
       clearInterval(flashInterval);
+      numberBox.style.backgroundColor = getColumnColor(randomNumber);
       updateNumber(randomNumber);
+      // ボタンを再度有効化
+      startBtn.disabled = false;
+      manualBtn.disabled = false;
+      resetBtn.disabled = false;
     }, 2000);
   });
 
@@ -136,26 +166,24 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // 過去の数字をクリックして編集
-  historyGrid.addEventListener("click", (event) => {
-    const target = event.target;
-    if (target.classList.contains("history-number")) {
-      const newNumber = prompt("新しい数字を入力してください:", target.textContent);
-      const number = parseInt(newNumber);
-      if (!number || number < 1 || number > 75) {
-        alert("1～75の間の数字を入力してください。");
-        return;
-      }
-
-      const index = usedNumbers.indexOf(parseInt(target.textContent));
-      if (index > -1) {
-        usedNumbers[index] = number;
-      }
-
-      firebase.database().ref("bingo").update({
-        history: usedNumbers,
-      });
-
-      updateHistoryGrid();
+  editSubmit.addEventListener("click", () => {
+    const newNumber = parseInt(editNumberInput.value);
+    if (!newNumber || newNumber < 1 || newNumber > 75 || usedNumbers.includes(newNumber)) {
+      alert("1～75の間の数字を入力するか、すでに使用されている数字は入力できません。");
+      return;
     }
+
+    const oldNumber = parseInt(selectedNumberLabel.textContent.replace("選択した数字: ", ""));
+    const index = usedNumbers.indexOf(oldNumber);
+    if (index > -1) {
+      usedNumbers[index] = newNumber;
+    }
+
+    firebase.database().ref("bingo").update({
+      history: usedNumbers,
+    });
+
+    editPopup.style.display = "none";
+    updateHistoryGrid();
   });
 });
