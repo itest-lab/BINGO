@@ -94,9 +94,9 @@ body {
   font-weight: bold;
   background-color: #e3e3e3;
   border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   border: 2px solid black; /* 黒枠を追加 */
   cursor: pointer; /* ボタンのように見せるためのスタイル */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* 影を削除 */
 }
 
 /* ポップアップ */
