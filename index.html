@@ -5,29 +5,36 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ビンゴゲーム</title>
   <link rel="stylesheet" href="styles.css">
-  <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js"></script>
 </head>
 <body>
   <div id="app">
-    <div id="login-screen">
-      <h1>ビンゴゲーム ログイン</h1>
-      <label for="password">管理者パスワード:</label>
-      <input type="password" id="password">
-      <button id="login-btn">ログイン</button>
+    <header>
+      <button id="admin-login-btn">管理者ログイン</button>
+    </header>
+    
+    <h1>ビンゴゲーム</h1>
+    <div id="bingo-board"></div>
+    <div id="controls" style="display:none;">
+      <input type="number" id="number-input" placeholder="数字を入力 (1-75)">
+      <button id="submit-number">数字を送信</button>
+      <button id="random-start">ランダムスタート</button>
     </div>
+    <div id="latest-number">最新の数字: <span id="current-number">--</span></div>
+  </div>
 
-    <div id="game-screen" style="display:none;">
-      <h1>ビンゴゲーム</h1>
-      <div id="bingo-board"></div>
-      <div id="controls">
-        <input type="number" id="number-input" placeholder="数字を入力 (1-75)">
-        <button id="submit-number">数字を送信</button>
-        <button id="random-start">ランダムスタート</button>
-      </div>
-      <div id="latest-number">最新の数字: <span id="current-number">--</span></div>
+  <!-- 管理者ログインポップアップ -->
+  <div id="admin-popup" class="popup" style="display:none;">
+    <div class="popup-content">
+      <h2>管理者ログイン</h2>
+      <label for="admin-password">パスワード:</label>
+      <input type="password" id="admin-password">
+      <button id="admin-login-submit">ログイン</button>
+      <button id="close-popup">閉じる</button>
     </div>
   </div>
+
   <script src="firebase-config.js"></script>
   <script src="app.js"></script>
 </body>
