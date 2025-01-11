@@ -1,3 +1,4 @@
+/* 基本設定 */
 body {
   font-family: Arial, sans-serif;
   margin: 0;
@@ -10,13 +11,16 @@ body {
 
 header {
   width: 100%;
-  display: flex;
-  justify-content: flex-end;
+  text-align: center;
   padding: 10px;
   background-color: #444;
+  color: white;
 }
 
 header button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
   background-color: #007bff;
   color: white;
   border: none;
@@ -29,31 +33,44 @@ header button:hover {
   background-color: #0056b3;
 }
 
-#bingo-board {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 10px;
-  margin-top: 20px;
+#latest-number {
+  font-size: 48px;
+  margin: 20px 0;
 }
 
-.bingo-cell {
-  width: 50px;
-  height: 50px;
+#history {
+  margin: 20px 0;
+}
+
+#number-history {
+  list-style: none;
+  padding: 0;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #e3e3e3;
-  font-size: 20px;
-  font-weight: bold;
-  border-radius: 5px;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
-.bingo-cell[data-column="B"] { background-color: #add8e6; } /* 青 */
-.bingo-cell[data-column="I"] { background-color: #f08080; } /* 赤 */
-.bingo-cell[data-column="N"] { background-color: #90ee90; } /* 緑 */
-.bingo-cell[data-column="G"] { background-color: #ffd700; } /* 黄 */
-.bingo-cell[data-column="O"] { background-color: #dda0dd; } /* 紫 */
+#number-history li {
+  padding: 10px;
+  background-color: #e3e3e3;
+  border-radius: 5px;
+  font-weight: bold;
+}
 
+button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+/* ポップアップ */
 .popup {
   position: fixed;
   top: 0;
