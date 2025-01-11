@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // 過去の数字を表示
   const updateHistoryGrid = () => {
     historyGrid.innerHTML = "";
-    for (let i = 0; i < 70; i++) {
+    for (let i = 0; i < 75; i++) {
       const numberElement = document.createElement("div");
       numberElement.className = "history-number";
       numberElement.textContent = usedNumbers[i] || "";
