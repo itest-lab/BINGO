@@ -15,11 +15,20 @@ document.addEventListener("DOMContentLoaded", () => {
   const editSubmit = document.getElementById("edit-submit");
   const closeEditPopup = document.getElementById("close-edit-popup");
   const selectedNumberLabel = document.getElementById("selected-number-label");
+  const alertPopup = document.getElementById("alert-popup");
+  const alertMessage = document.getElementById("alert-message");
+  const closeAlertPopup = document.getElementById("close-alert-popup");
 
   const db = firebase.database();
   let isAdmin = false;
   let usedNumbers = [];
   let currentNumber = null;
+
+  // アラートを表示する関数
+  const showAlert = (message) => {
+    alertMessage.textContent = message;
+    alertPopup.style.display = "flex";
+  };
 
   // 数字の列に応じた色を取得
   const getColumnColor = (number) => {
@@ -32,7 +41,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 数字を更新して表示
   const updateNumber = (number) => {
-    if (usedNumbers.includes(number)) return;
+    if (usedNumbers.includes(number)) {
+      showAlert("この数字はすでに使用されています。");
+      return;
+    }
     usedNumbers.unshift(number); // 最新の数字を先頭に追加
 
     firebase.database().ref("bingo").update({
@@ -53,7 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // 過去の数字を表示
   const updateHistoryGrid = () => {
     historyGrid.innerHTML = "";
-    for (let i = 0; i < 75; i++) {
+    for (let i = 0; i < 70; i++) {
       const numberElement = document.createElement("div");
       numberElement.className = "history-number";
       numberElement.textContent = usedNumbers[i] || "";
@@ -82,7 +94,7 @@ document.addEventListener("DOMContentLoaded", () => {
   adminLoginSubmit.addEventListener("click", () => {
     const password = adminPasswordInput.value;
     if (password === "admin123") {
-      alert("管理者ログイン成功！");
+      showAlert("管理者ログイン成功！");
       isAdmin = true;
       startBtn.style.display = "inline-block";
       manualBtn.style.display = "inline-block";
@@ -90,7 +102,7 @@ document.addEventListener("DOMContentLoaded", () => {
       controls.style.display = "flex"; // フッターに表示
       adminPopup.style.display = "none";
     } else {
-      alert("パスワードが間違っています！");
+      showAlert("パスワードが間違っています！");
     }
   });
 
@@ -103,10 +115,15 @@ document.addEventListener("DOMContentLoaded", () => {
     editPopup.style.display = "none";
   });
 
+  // アラートポップアップを閉じる
+  closeAlertPopup.addEventListener("click", () => {
+    alertPopup.style.display = "none";
+  });
+
   // ランダムスタート
   startBtn.addEventListener("click", () => {
     if (usedNumbers.length >= 75) {
-      alert("すべての数字が出ました！");
+      showAlert("すべての数字が出ました！");
       return;
     }
 
@@ -145,7 +162,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     const number = parseInt(manualNumber);
     if (!number || number < 1 || number > 75 || usedNumbers.includes(number)) {
-      alert("1～75の間の数字を入力するか、すでに使用されている数字は入力できません。");
+      showAlert("1～75の間の数字を入力するか、すでに使用されている数字は入力できません。");
       return;
     }
     updateNumber(number);
@@ -178,7 +195,7 @@ document.addEventListener("DOMContentLoaded", () => {
   editSubmit.addEventListener("click", () => {
     const newNumber = parseInt(editNumberInput.value);
     if (!newNumber || newNumber < 1 || newNumber > 75 || usedNumbers.includes(newNumber)) {
-      alert("1～75の間の数字を入力するか、すでに使用されている数字は入力できません。");
+      showAlert("1～75の間の数字を入力するか、すでに使用されている数字は入力できません。");
       return;
     }
 
@@ -186,13 +203,20 @@ document.addEventListener("DOMContentLoaded", () => {
     const index = usedNumbers.indexOf(oldNumber);
     if (index > -1) {
       usedNumbers[index] = newNumber;
+      usedNumbers[0] = newNumber; // 最新の数字も変更
     }
 
     firebase.database().ref("bingo").update({
+      latestNumber: newNumber,
       history: usedNumbers,
     });
 
     editPopup.style.display = "none";
     updateHistoryGrid();
+    displayNumber(newNumber); // 最新の数字を更新して表示
+  });
+
+  closeAlertPopup.addEventListener("click", () => {
+    alertPopup.style.display = "none";
   });
 });
