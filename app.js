@@ -5,85 +5,105 @@ document.addEventListener("DOMContentLoaded", () => {
   const adminLoginSubmit = document.getElementById("admin-login-submit");
   const closePopupBtn = document.getElementById("close-popup");
   const startBtn = document.getElementById("start-btn");
+  const manualBtn = document.getElementById("manual-btn");
   const resetBtn = document.getElementById("reset-btn");
   const currentNumberDisplay = document.getElementById("current-number");
-  const numberHistoryList = document.getElementById("number-history");
-  const controls = document.getElementById("controls");
+  const numberGrid = document.getElementById("number-grid");
+  const editPopup = document.getElementById("edit-popup");
+  const currentNumberEdit = document.getElementById("current-number-edit");
+  const newNumberInput = document.getElementById("new-number");
+  const editConfirmBtn = document.getElementById("edit-confirm");
+  const editCancelBtn = document.getElementById("edit-cancel");
 
   const db = firebase.database();
   let isAdmin = false;
   let usedNumbers = [];
 
-  // 管理者ログインポップアップを開く
-  adminLoginBtn.addEventListener("click", () => {
-    adminPopup.style.display = "flex";
-  });
-
-  // 管理者ログイン処理
-  adminLoginSubmit.addEventListener("click", () => {
-    const password = adminPasswordInput.value;
-    if (password === "admin123") { // 管理者パスワード
-      alert("管理者ログイン成功！");
-      isAdmin = true;
-      controls.style.display = "block"; // 操作パネルを有効化
-      adminPopup.style.display = "none";
-    } else {
-      alert("パスワードが間違っています！");
-    }
-  });
-
-  // ポップアップを閉じる
-  closePopupBtn.addEventListener("click", () => {
-    adminPopup.style.display = "none";
-  });
-
-  // スタートボタンをクリック
-  startBtn.addEventListener("click", () => {
-    if (usedNumbers.length >= 75) {
-      alert("すべての数字が出ました！");
-      return;
-    }
-
-    let randomNumber;
-    do {
-      randomNumber = Math.floor(Math.random() * 75) + 1;
-    } while (usedNumbers.includes(randomNumber));
-
-    usedNumbers.push(randomNumber);
-    updateNumber(randomNumber);
-  });
-
-  // リセットボタンをクリック
-  resetBtn.addEventListener("click", () => {
-    usedNumbers = [];
-    firebase.database().ref("bingo").set({
-      latestNumber: null,
-      history: []
-    });
-  });
-
-  // 数字を更新
-  const updateNumber = (number) => {
-    firebase.database().ref("bingo").update({
-      latestNumber: number,
-      history: usedNumbers
+  // 過去の数字を表示する関数
+  const renderGrid = () => {
+    numberGrid.innerHTML = ""; // グリッドをリセット
+    usedNumbers.forEach((number) => {
+      const cell = document.createElement("div");
+      cell.classList.add("number-cell");
+      const column = getColumn(number);
+      cell.dataset.column = column;
+      cell.textContent = number;
+      cell.addEventListener("click", () => openEditPopup(number));
+      numberGrid.appendChild(cell);
     });
   };
 
-  // 最新の数字をリアルタイム更新
+  const getColumn = (number) => {
+    if (number <= 15) return "B";
+    if (number <= 30) return "I";
+    if (number <= 45) return "N";
+    if (number <= 60) return "G";
+    return "O";
+  };
+
+  // 編集ポップアップを開く
+  const openEditPopup = (number) => {
+    currentNumberEdit.value = number;
+    newNumberInput.value = "";
+    editPopup.style.display = "flex";
+  };
+
+  // 編集ポップアップを閉じる
+  const closeEditPopup = () => {
+    editPopup.style.display = "none";
+  };
+
+  // 数字を更新する
+  const updateNumber = (number) => {
+    if (usedNumbers.includes(number)) return;
+    usedNumbers.push(number);
+    firebase.database().ref("bingo").update({
+      latestNumber: number,
+      history: usedNumbers,
+    });
+  };
+
+  // ポップアップ操作
+  editConfirmBtn.addEventListener("click", () => {
+    const oldNumber = parseInt(currentNumberEdit.value);
+    const newNumber = parseInt(newNumberInput.value);
+
+    if (!newNumber || newNumber < 1 || newNumber > 75) {
+      alert("1～75の間の数字を入力してください。");
+      return;
+    }
+
+    const index = usedNumbers.indexOf(oldNumber);
+    if (index !== -1) {
+      usedNumbers[index] = newNumber;
+      firebase.database().ref("bingo").update({
+        history: usedNumbers,
+      });
+    }
+
+    closeEditPopup();
+  });
+
+  editCancelBtn.addEventListener("click", closeEditPopup);
+
+  // リアルタイム最新数字更新
   firebase.database().ref("bingo/latestNumber").on("value", (snapshot) => {
     const latestNumber = snapshot.val();
     currentNumberDisplay.textContent = latestNumber || "--";
   });
 
-  // 過去の数字一覧をリアルタイム更新
+  // リアルタイム過去の数字更新
   firebase.database().ref("bingo/history").on("value", (snapshot) => {
-    const history = snapshot.val() || [];
-    numberHistoryList.innerHTML = ""; // リストをクリア
-    history.forEach((number) => {
-      const li = document.createElement("li");
-      li.textContent = number;
-      numberHistoryList.appendChild(li);
+    usedNumbers = snapshot.val() || [];
+    renderGrid();
+  });
+
+  // リセット
+  resetBtn.addEventListener("click", () => {
+    usedNumbers = [];
+    firebase.database().ref("bingo").set({
+      latestNumber: null,
+      history: [],
     });
   });
 });
