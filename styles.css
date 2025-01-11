@@ -3,16 +3,30 @@ body {
   margin: 0;
   padding: 0;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  height: 100vh;
   background-color: #f7f7f7;
 }
 
-#app {
-  text-align: center;
+header {
   width: 100%;
-  max-width: 600px;
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px;
+  background-color: #444;
+}
+
+header button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+header button:hover {
+  background-color: #0056b3;
 }
 
 #bingo-board {
@@ -39,3 +53,23 @@ body {
 .bingo-cell[data-column="N"] { background-color: #90ee90; } /* 緑 */
 .bingo-cell[data-column="G"] { background-color: #ffd700; } /* 黄 */
 .bingo-cell[data-column="O"] { background-color: #dda0dd; } /* 紫 */
+
+.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.popup-content {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
