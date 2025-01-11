@@ -16,16 +16,22 @@
     </header>
     
     <main>
-      <div id="latest-number">
-        最新の数字: <span id="current-number">--</span>
-      </div>
-      <div id="history">
-        <h3>過去の数字</h3>
-        <ul id="number-history"></ul>
-      </div>
-      <div id="controls" style="display:none;">
-        <button id="start-btn">スタート</button>
-        <button id="reset-btn">リセット</button>
+      <div id="container">
+        <!-- 過去の数字 -->
+        <div id="history">
+          <h3>過去の数字</h3>
+          <div id="number-grid"></div>
+        </div>
+        <!-- 最新の数字 -->
+        <div id="latest-number">
+          <h3>最新の数字</h3>
+          <div id="current-number">--</div>
+          <div id="controls" style="display:none;">
+            <button id="start-btn">ランダムスタート</button>
+            <button id="manual-btn">手動入力</button>
+            <button id="reset-btn">リセット</button>
+          </div>
+        </div>
       </div>
     </main>
   </div>
@@ -38,6 +44,19 @@
       <input type="password" id="admin-password">
       <button id="admin-login-submit">ログイン</button>
       <button id="close-popup">閉じる</button>
+    </div>
+  </div>
+
+  <!-- 編集ポップアップ -->
+  <div id="edit-popup" class="popup" style="display:none;">
+    <div class="popup-content">
+      <h2>数字を編集</h2>
+      <label for="current-number-edit">現在の数字:</label>
+      <input type="text" id="current-number-edit" readonly>
+      <label for="new-number">変更後の数字:</label>
+      <input type="number" id="new-number" min="1" max="75">
+      <button id="edit-confirm">確定</button>
+      <button id="edit-cancel">キャンセル</button>
     </div>
   </div>
 
