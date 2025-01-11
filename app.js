@@ -1,4 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
+  const db = firebase.database(); // Firebaseのデータベース参照を取得
+
   const bingoBoard = document.getElementById("bingo-board");
   const controls = document.getElementById("controls");
   const adminLoginBtn = document.getElementById("admin-login-btn");
@@ -11,7 +13,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const numberInput = document.getElementById("number-input");
   const currentNumberDisplay = document.getElementById("current-number");
 
-  const db = firebase.database();
   let isAdmin = false;
 
   // ビンゴボードを生成
@@ -25,7 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
       cell.textContent = i === 12 ? "FREE" : Math.floor(Math.random() * 15) + 1 + 15 * (i % 5);
       bingoBoard.appendChild(cell);
     }
-  };
+  });
 
   createBingoBoard();
 
