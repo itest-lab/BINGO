@@ -3,36 +3,13 @@ body {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
-  background-color: #f7f7f7;
+  background-color: #ffffff; /* 背景色を白に変更 */
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-header {
-  width: 100%;
-  text-align: center;
-  padding: 10px;
-  background-color: white; /* ヘッダーの背景色を白に変更 */
-  color: white;
-  position: relative;
-}
-
-header button {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-  position: absolute;
-  top: 50px; /* 上端から50px */
-  left: 50px; /* 左端から50px */
-}
-
-header button:hover {
-  background-color: #0056b3;
-}
+/* ヘッダーなしに修正 */
 
 /* 最新の数字 */
 #main-container {
@@ -73,11 +50,10 @@ header button:hover {
 #controls {
   width: 100%;
   display: flex;
-  justify-content: center;
+  justify-content: left;
   padding: 10px;
-  background-color: white;
-  border-top: 1px solid #ccc;
-  margin-top: auto; /* 下部に固定 */
+  background-color: white; /* 背景色を白に変更 */
+  border-top: none; /* フッターの枠を消す */
 }
 
 #controls button {
