@@ -198,39 +198,40 @@ document.addEventListener("DOMContentLoaded", () => {
     const latestNumber = snapshot.val();
     displayNumber(latestNumber);
   });
-  
+
   // Firebaseから過去の数字をリアルタイムで取得
   firebase.database().ref("bingo/history").on("value", (snapshot) => {
     usedNumbers = snapshot.val() || [];
     updateHistoryGrid();
   });
-  
-  // 過去の数字をクリックして編集
+
+   // 過去の数字をクリックして編集
   editSubmit.addEventListener("click", () => {
     const newNumber = parseInt(editNumberInput.value);
     if (!newNumber || newNumber < 1 || newNumber > 75 || usedNumbers.includes(newNumber)) {
       showAlert("1～75の間の数字を入力するか、すでに使用されている数字は入力できません。");
       return;
     }
-  
+
     const oldNumber = parseInt(selectedNumberLabel.textContent.replace("選択した数字: ", ""));
     const index = usedNumbers.indexOf(oldNumber);
     if (index > -1) {
       usedNumbers[index] = newNumber;
       usedNumbers[0] = newNumber; // 最新の数字も変更
     }
-  
+
     firebase.database().ref("bingo").update({
       latestNumber: newNumber,
       history: usedNumbers,
     });
-  
+
     editPopup.style.display = "none";
     updateHistoryGrid();
     displayNumber(newNumber); // 最新の数字を更新して表示
   });
-  
+
   // アラートポップアップを閉じる
   closeAlertPopup.addEventListener("click", () => {
     alertPopup.style.display = "none";
   });
+});
