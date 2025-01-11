@@ -62,11 +62,11 @@ document.addEventListener("DOMContentLoaded", () => {
     for (let i = 0; i < 70; i++) {
       const numberElement = document.createElement("div");
       numberElement.className = "history-number";
-      numberElement.textContent = usedNumbers[i] || "--";
+      numberElement.textContent = usedNumbers[i] || "";
+      numberElement.style.backgroundColor = usedNumbers[i] ? getColumnColor(usedNumbers[i]) : "transparent";
+      numberElement.style.border = usedNumbers[i] ? "2px solid black" : "none"; // 黒枠を追加
       numberElement.style.width = "75px";  // 各グリッドの幅
       numberElement.style.height = "75px"; // 各グリッドの高さ
-      numberElement.style.backgroundColor = usedNumbers[i] ? getColumnColor(usedNumbers[i]) : "#e3e3e3";
-      numberElement.style.border = "2px solid black"; // 黒枠を追加
       numberElement.addEventListener("click", () => {
         if (isAdmin && usedNumbers[i]) {
           selectedNumberLabel.textContent = `選択した数字: ${usedNumbers[i]}`;
@@ -89,8 +89,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (password === "admin123") {
       alert("管理者ログイン成功！");
       isAdmin = true;
+      startBtn.style.display = "inline-block";
+      manualBtn.style.display = "inline-block";
+      resetBtn.style.display = "inline-block";
       controls.style.display = "flex"; // フッターに表示
-      controls.style.left = "50px"; // 左端から50px空ける
       adminPopup.style.display = "none";
     } else {
       alert("パスワードが間違っています！");
