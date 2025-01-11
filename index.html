@@ -3,27 +3,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ビンゴゲーム</title>
+  <title>ビンゴマシーン</title>
   <link rel="stylesheet" href="styles.css">
-  <script src="https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js"></script>
-
-  <script type="module" src="firebase-config.js"></script> <!-- Firebaseの初期化 -->
+  <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.2/firebase-database-compat.js"></script>
 </head>
 <body>
   <div id="app">
     <header>
+      <h1>ビンゴマシーン</h1>
       <button id="admin-login-btn">管理者ログイン</button>
     </header>
     
-    <h1>ビンゴゲーム</h1>
-    <div id="bingo-board"></div>
-    <div id="controls" style="display:none;">
-      <input type="number" id="number-input" placeholder="数字を入力 (1-75)">
-      <button id="submit-number">数字を送信</button>
-      <button id="random-start">ランダムスタート</button>
-    </div>
-    <div id="latest-number">最新の数字: <span id="current-number">--</span></div>
+    <main>
+      <div id="latest-number">
+        最新の数字: <span id="current-number">--</span>
+      </div>
+      <div id="history">
+        <h3>過去の数字</h3>
+        <ul id="number-history"></ul>
+      </div>
+      <div id="controls" style="display:none;">
+        <button id="start-btn">スタート</button>
+        <button id="reset-btn">リセット</button>
+      </div>
+    </main>
   </div>
 
   <!-- 管理者ログインポップアップ -->
@@ -37,6 +41,7 @@
     </div>
   </div>
 
-  <script src="app.js"></script>            <!-- アプリのロジック -->
+  <script src="firebase-config.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
