@@ -1,29 +1,225 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ビンゴサイト</title>
-  <link rel="stylesheet" href="styles.css">
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>リアルタイムビンゴ</title>
+    <link rel="stylesheet" href="styles.css">
+
+    <script>
+    import { initializeApp }              from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+    import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+    
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+    apiKey: "AIzaSyBv7bPCjXzKEtzqGtmWl9fJWLCw_1qXOIc",
+    authDomain: "bingo-main.firebaseapp.com",
+    projectId: "bingo-main",
+    storageBucket: "bingo-main.firebasestorage.app",
+    messagingSenderId: "945725247317",
+    appId: "1:945725247317:web:bfb58e8a76b452665b69dc",
+    measurementId: "G-QJJ73C5KBX",
+    databaseURL: "https://bingo-main-default-rtdb.asia-southeast1.firebasedatabase.app/"
+    };
+    
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+    console.log('Firebase has been initialized', app); // Firebaseが初期化されていることを確認
+
+
+    // Firebaseに書き込んで確認
+    const dbRef = ref(database, 'bingo/testConnection');
+    set(dbRef, 'connected')
+    .then(() => {
+        console.log('Firebaseへの書き込み成功');
+    })
+    .catch((error) => {
+        console.error('Firebaseへの書き込みエラー:', error);
+    });
+
+    // Firebaseから読み込んで確認
+    get(ref(database, 'bingo/testConnection'))
+    .then((snapshot) => {
+        if (snapshot.exists()) {
+        console.log('Firebaseからの読み込み成功:', snapshot.val());
+        } else {
+        console.log('Firebaseにデータがありません');
+        }
+    })
+    .catch((error) => {
+        console.error('Firebaseからの読み込みエラー:', error);
+    });
+    console.log("Firebase initialized:", app);
+
+    // グローバルに公開する必要がある場合
+    window.db = db;
+    window.ref = ref;
+    window.set = set;
+    window.get = get;
+    window.onValue = onValue;
+    </script>
 </head>
+
 <body>
-  <div id="container">
-    <div id="current-number">
-      <h1 id="current">-</h1>
+    <div id="main-container">
+        <div id="current-number">
+            <div id="currentNumberDisplay" class="number">--</div>
+        </div>
+        <div id="past-numbers"></div>
     </div>
-    <div id="controls">
-      <button id="start">スタート</button>
-      <input id="manual-number" type="number" placeholder="数字を入力">
-      <button id="set-number">設定</button>
+
+    <div class="admin-controls" id="admin-controls">
+        <input type="text" id="numberInput" placeholder="数字を入力してください" autocomplete="off" autocorrect="off">
+        <button id="sendNumber">送信</button>
+        <button onclick="resetNumbers()">リセット</button>
     </div>
-    <div id="past-numbers">
-      <h2>過去の数字</h2>
-      <div id="history"></div>
+
+    <button id="admin-button">参加者モード</button>
+    <div id="password-popup" class="popup">
+        <input type="password" id="passwordInput" placeholder="パスワードを入力してください">
+        <button id="password-confirm">確認</button>
+        <button id="closePasswordPopup">キャンセル</button>
     </div>
-  </div>
-  <script src="script.js"></script>
+    <div class="overlay" id="overlay"></div>
+
+    <script type="module" src="script.js"></script>
+
+    <script>
+        // 必要な変数やFirebaseモジュールを参照
+        const db = window.db;
+        const ref = window.ref;
+        const set = window.set;
+        const onValue = window.onValue;
+
+        // **数字送信機能**
+        let pastNumbers = [];
+
+        // 数字を同期する関数
+        function syncPastNumbers() {
+            const pastNumbersRef = ref(db, 'bingo/pastNumbers');
+            onValue(pastNumbersRef, (snapshot) => {
+                const numbers = snapshot.val() || [];
+                pastNumbers = numbers;
+                updatePastNumbersList();
+            });
+        }
+
+        // 数字を送信する
+        document.getElementById("sendNumber").addEventListener("click", () => {
+            const inputField = document.getElementById("numberInput");
+            const inputValue = inputField.value.trim();
+
+            if (!/^[0-9]+$/.test(inputValue)) {
+                alert("半角数字のみ入力してください。");
+                inputField.value = "";
+                return;
+            }
+
+            if (pastNumbers.includes(inputValue)) {
+                alert("この数字は既に追加されています。");
+                return;
+            }
+
+            const pastNumbersRef = ref(db, "bingo/pastNumbers");
+            pastNumbers.push(inputValue);
+            set(pastNumbersRef, pastNumbers)
+                .then(() => console.log("数字が保存されました:", inputValue))
+                .catch((error) => console.error("保存エラー:", error));
+
+            addNumberToHTML(inputValue);
+            inputField.value = "";
+        });
+
+        document.getElementById("sendNumber").addEventListener("click", sendNumber);
+
+        // 初期化
+        syncPastNumbersFromFirebase();
+
+        // 現在の数字を更新する
+        function updateCurrentNumber(number) {
+            const currentNumberDisplay = document.getElementById('currentNumberDisplay');
+            currentNumberDisplay.textContent = number;
+
+            currentNumberDisplay.className = 'number'; // クラスをリセット
+            const num = parseInt(number, 10);
+            if (num >= 1 && num <= 15) currentNumberDisplay.classList.add('B');
+            else if (num >= 16 && num <= 30) currentNumberDisplay.classList.add('I');
+            else if (num >= 31 && num <= 45) currentNumberDisplay.classList.add('N');
+            else if (num >= 46 && num <= 60) currentNumberDisplay.classList.add('G');
+            else if (num >= 61 && num <= 75) currentNumberDisplay.classList.add('O');
+        }
+        // 数字をHTMLに追加する関数
+        function addNumberToHTML(number) {
+            const pastNumbersContainer = document.getElementById("past-numbers");
+            const numberElement = document.createElement("div");
+            numberElement.classList.add("number");
+            numberElement.textContent = number;
+
+            // 数字の色分け（B, I, N, G, O）
+            const num = parseInt(number, 10);
+            if (num >= 1 && num <= 15) numberElement.classList.add("B");
+            else if (num >= 16 && num <= 30) numberElement.classList.add("I");
+            else if (num >= 31 && num <= 45) numberElement.classList.add("N");
+            else if (num >= 46 && num <= 60) numberElement.classList.add("G");
+            else if (num >= 61 && num <= 75) numberElement.classList.add("O");
+
+            // 数字をHTMLに追加
+            pastNumbersContainer.appendChild(numberElement);
+        }
+
+        // Firebase からデータをリアルタイムで同期
+        function syncPastNumbersFromFirebase() {
+
+            // Firebase からデータを取得
+            onValue(pastNumbersRef, (snapshot) => {
+                const numbers = snapshot.val() || [];
+                pastNumbers = numbers;
+
+                // HTML をクリアして再描画
+                const pastNumbersContainer = document.getElementById("past-numbers");
+                pastNumbersContainer.innerHTML = ""; // 一旦クリア
+                numbers.forEach((number) => {
+                    addNumberToHTML(number); // 数字を順次追加
+                });
+            });
+        }
+
+        // 過去の数字リストを更新する
+        function updatePastNumbersList() {
+            const pastNumbersContainer = document.getElementById('past-numbers');
+            pastNumbersContainer.innerHTML = '';
+
+            pastNumbers.forEach((number) => {
+                const numberElement = document.createElement('div');
+                numberElement.classList.add('number');
+                numberElement.textContent = number;
+
+                // 数値に応じた色分け
+                const num = parseInt(number, 10);
+                if (num >= 1 && num <= 15) numberElement.classList.add('B');
+                else if (num >= 16 && num <= 30) numberElement.classList.add('I');
+                else if (num >= 31 && num <= 45) numberElement.classList.add('N');
+                else if (num >= 46 && num <= 60) numberElement.classList.add('G');
+                else if (num >= 61 && num <= 75) numberElement.classList.add('O');
+
+                pastNumbersContainer.appendChild(numberElement);
+            });
+        }
+
+        // リセットボタンの処理
+        function resetNumbers() {
+            pastNumbers = [];
+            const pastNumbersRef = ref(db, 'bingo/pastNumbers');
+            set(pastNumbersRef, pastNumbers); // Firebaseをリセット
+            updatePastNumbersList(); // 表示をリセット
+            updateCurrentNumber('--'); // 現在の数字をリセット
+        }
+
+        // 初期化
+        syncPastNumbers();
+    </script>
+
 </body>
 </html>
