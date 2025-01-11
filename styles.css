@@ -81,7 +81,7 @@ body {
 #history-grid {
   display: grid;
   grid-template-columns: repeat(10, 75px);
-  grid-template-rows: repeat(8, 75px);
+  grid-template-rows: repeat(7, 75px);
   gap: 10px;
 }
 
@@ -119,42 +119,4 @@ body {
   border-radius: 10px;
   text-align: center;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-#edit-popup .popup-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-#edit-popup label {
-  margin-bottom: 10px;
-}
-
-#edit-popup input[type="number"] {
-  margin-left: 10px;
-}
-
-#edit-popup button {
-  margin-left: 10px;
-}
-
-#alert-popup .popup-content {
-  text-align: center;
-}
-
-#alert-popup p {
-  margin: 20px 0;
-}
-
-#reset-confirm-popup .popup-content {
-  text-align: center;
-}
-
-#reset-confirm-popup p {
-  margin: 20px 0;
-}
-
-#reset-confirm-popup button {
-  margin: 10px;
 }
