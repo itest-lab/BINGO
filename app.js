@@ -226,19 +226,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const oldNumber = parseInt(selectedNumberLabel.textContent.replace("選択した数字: ", ""));
     const index = usedNumbers.indexOf(oldNumber);
-    if (index > -1) {
+    if (index > -1 && index !== 0) { // 一番左上の数字を変更しない
       usedNumbers[index] = newNumber;
-      usedNumbers[0] = newNumber; // 最新の数字も変更
+    } else {
+      showAlert("この数字は変更できません。");
+      return;
     }
 
     firebase.database().ref("bingo").update({
-      latestNumber: newNumber,
+      latestNumber: usedNumbers[0], // 一番左上の数字を保持
       history: usedNumbers,
     });
 
     editPopup.style.display = "none";
     updateHistoryGrid();
-    displayNumber(newNumber); // 最新の数字を更新して表示
+    displayNumber(usedNumbers[0]); // 最新の数字を更新して表示
   });
 
   // アラートポップアップを閉じる
