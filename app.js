@@ -25,6 +25,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const manualNumberInput = document.getElementById("manual-number-input");
   const manualSubmit = document.getElementById("manual-submit");
   const closeManualPopup = document.getElementById("close-manual-popup");
+  const deleteNumberBtn = document.getElementById("delete-number-btn"); // 削除ボタン 
+  const deleteConfirmPopup = document.getElementById("delete-confirm-popup"); // 削除確認ポップアップ 
+  const confirmDeleteBtn = document.getElementById("confirm-delete-btn"); // 削除確認ポップアップの「はい」ボタン 
+  const cancelDeleteBtn = document.getElementById("cancel-delete-btn"); // 削除確認ポップアップの「いいえ」ボタン
   
   const db = firebase.database();
   let isAdmin = false;
