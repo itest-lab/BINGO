@@ -42,8 +42,19 @@
         </div>
         <div style="margin-top: 20px; display: flex; justify-content: center;">
           <button id="edit-submit" style="margin-right: 10px;">変更</button>
+          <button id="delete-number-btn" style="margin-right: 10px;">削除</button>
           <button id="close-edit-popup">閉じる</button>
         </div>
+      </div>
+    </div>
+    
+    <!-- 削除確認ポップアップ -->
+    <div id="delete-confirm-popup" class="popup" style="display:none;">
+      <div class="popup-content">
+        <h2>削除確認</h2>
+        <p>本当に削除しますか？</p>
+        <button id="confirm-delete-btn">はい</button>
+        <button id="cancel-delete-btn">いいえ</button>
       </div>
     </div>
 
