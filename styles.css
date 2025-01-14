@@ -111,6 +111,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 999;
 }
 
 .popup-content {
@@ -119,6 +120,14 @@ body {
   border-radius: 10px;
   text-align: center;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+#manual-popup .popup-content {
+  z-index: 10;
+}
+
+#delete-confirm-popup .popup-content {
+  z-index: 20;
 }
 
 #manual-popup label {
@@ -131,10 +140,6 @@ body {
 
 #manual-popup button {
   margin-left: 10px;
-}
-
-#manual-popup .popup-content {
-  z-index: 10;
 }
 
 #alert-popup .popup-content, 
