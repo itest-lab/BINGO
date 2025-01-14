@@ -171,6 +171,42 @@ document.addEventListener("DOMContentLoaded", () => {
     resetConfirmPopup.style.display = "none";
   });
 
+  // 数字削除ボタンの処理
+  deleteNumberBtn.addEventListener("click", () => {
+    deleteConfirmPopup.style.display = "flex"; // 削除確認ポップアップを表示
+  });
+  
+  // 削除確認ポップアップで「はい」を押した場合
+  confirmDeleteBtn.addEventListener("click", () => {
+    const oldNumber = parseInt(selectedNumberLabel.textContent.replace("選択した数字: ", ""));
+    const index = usedNumbers.indexOf(oldNumber);
+    if (index > -1) {
+      usedNumbers.splice(index, 1); // 配列から数字を削除
+      if (index === 0 && usedNumbers.length > 0) {
+        // latestNumberを繰り上げ
+        const newLatestNumber = usedNumbers[0];
+        firebase.database().ref("bingo").update({
+          latestNumber: newLatestNumber,
+          history: usedNumbers,
+        });
+      } else {
+        firebase.database().ref("bingo").update({
+          history: usedNumbers,
+        });
+      }
+    }
+  
+    deleteConfirmPopup.style.display = "none"; // 削除確認ポップアップを閉じる
+    editPopup.style.display = "none"; // 数字編集ポップアップを閉じる
+    updateHistoryGrid();
+    displayNumber(usedNumbers[0] || "--"); // 最新の数字を更新して表示
+  });
+  
+  // 削除確認ポップアップで「いいえ」を押した場合
+  cancelDeleteBtn.addEventListener("click", () => {
+    deleteConfirmPopup.style.display = "none"; // 削除確認ポップアップを閉じる
+  });
+  
   // 手動入力ポップアップを開く
   manualBtn.addEventListener("click", () => {
     manualPopup.style.display = "flex";
