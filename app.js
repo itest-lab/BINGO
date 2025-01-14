@@ -25,10 +25,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const manualNumberInput = document.getElementById("manual-number-input");
   const manualSubmit = document.getElementById("manual-submit");
   const closeManualPopup = document.getElementById("close-manual-popup");
-  const deleteNumberBtn = document.getElementById("delete-number-btn"); // 削除ボタン 
-  const deleteConfirmPopup = document.getElementById("delete-confirm-popup"); // 削除確認ポップアップ 
-  const confirmDeleteBtn = document.getElementById("confirm-delete-btn"); // 削除確認ポップアップの「はい」ボタン 
-  const cancelDeleteBtn = document.getElementById("cancel-delete-btn"); // 削除確認ポップアップの「いいえ」ボタン
+  const deleteNumberBtn = document.getElementById("delete-number-btn"); 
+  const deleteConfirmPopup = document.getElementById("delete-confirm-popup"); 
+  const confirmDeleteBtn = document.getElementById("confirm-delete-btn"); 
+  const cancelDeleteBtn = document.getElementById("cancel-delete-btn");
   
   const db = firebase.database();
   let isAdmin = false;
@@ -95,7 +95,7 @@ document.addEventListener("DOMContentLoaded", () => {
     numberBox.style.backgroundColor = number ? getColumnColor(number) : "#e3e3e3";
   };
 
-  // 過去の数字を表示
+  // 過去の数字をクリックして編集ポップアップを表示
   const updateHistoryGrid = () => {
     historyGrid.innerHTML = "";
     for (let i = 0; i < 75; i++) {
@@ -111,7 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (isAdmin && usedNumbers[i]) {
           selectedNumberLabel.textContent = `選択した数字: ${usedNumbers[i]}`;
           editNumberInput.value = usedNumbers[i];
-          editPopup.style.display = "flex";
+          editPopup.style.display = "flex"; // ポップアップを表示
         }
       });
       historyGrid.appendChild(numberElement);
@@ -175,7 +175,6 @@ document.addEventListener("DOMContentLoaded", () => {
     resetConfirmPopup.style.display = "none";
   });
 
-  
   // 手動入力ポップアップを開く
   manualBtn.addEventListener("click", () => {
     manualPopup.style.display = "flex";
@@ -247,7 +246,7 @@ document.addEventListener("DOMContentLoaded", () => {
   editSubmit.addEventListener("click", () => {
     const newNumber = parseInt(editNumberInput.value);
     if (!newNumber || newNumber < 1 || newNumber > 75 || usedNumbers.includes(newNumber)) {
-      showAlert("1～75の間の数字を入力するか、すでに使用されてい る数字は入力できません。");
+      showAlert("1～75の間の数字を入力するか、すでに使用されている数字は入力できません。");
       return;
     }
 
@@ -274,12 +273,12 @@ document.addEventListener("DOMContentLoaded", () => {
   closeAlertPopup.addEventListener("click", () => {
     alertPopup.style.display = "none";
   });
-
+  
   // 数字削除ボタンの処理
   deleteNumberBtn.addEventListener("click", () => {
     deleteConfirmPopup.style.display = "flex"; // 削除確認ポップアップを表示
   });
-  
+
   // 削除確認ポップアップで「はい」を押した場合
   confirmDeleteBtn.addEventListener("click", () => {
     const oldNumber = parseInt(selectedNumberLabel.textContent.replace("選択した数字: ", ""));
@@ -299,13 +298,13 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
     }
-  
+
     deleteConfirmPopup.style.display = "none"; // 削除確認ポップアップを閉じる
     editPopup.style.display = "none"; // 数字編集ポップアップを閉じる
     updateHistoryGrid();
     displayNumber(usedNumbers[0] || "--"); // 最新の数字を更新して表示
   });
-  
+
   // 削除確認ポップアップで「いいえ」を押した場合
   cancelDeleteBtn.addEventListener("click", () => {
     deleteConfirmPopup.style.display = "none"; // 削除確認ポップアップを閉じる
