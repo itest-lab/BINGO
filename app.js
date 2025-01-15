@@ -34,6 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let isAdmin = false;
   let usedNumbers = [];
   let currentNumber = null;
+  let isFlashing = false; // ランダム点滅中かどうかを判定するフラグ
 
   // アラートを表示する関数
   const showAlert = (message) => {
@@ -52,17 +53,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 数字を更新して表示
   const updateNumber = (number) => {
+    if (isFlashing) return; // ランダム点滅中は更新しない
+  
     if (usedNumbers.includes(number)) {
       showAlert("この数字はすでに使用されています。");
       return;
     }
+  
     usedNumbers.unshift(number); // 最新の数字を先頭に追加
-
+  
     firebase.database().ref("bingo").update({
       latestNumber: number,
       history: usedNumbers,
     });
-
+  
     displayNumber(number);
     updateHistoryGrid();
   };
@@ -75,19 +79,59 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // 数字がランダムに点滅し、最終的に最新の数字を表示
   const flashNumber = (latestNumber) => {
+    isFlashing = true; // ランダム点滅開始
     let flashInterval = setInterval(() => {
       numberBox.textContent = Math.floor(Math.random() * 75) + 1;
       numberBox.style.backgroundColor = "white";
     }, 100);
-
+  
     // 2秒後に停止して最新の数字を表示
     setTimeout(() => {
       clearInterval(flashInterval);
-      displayNumber(latestNumber);
+      displayNumber(latestNumber); // 最新の数字を表示
+      updateNumber(latestNumber); // 履歴を更新
+      isFlashing = false; // ランダム点滅終了
     }, 2000);
   };
+  
+  startBtn.addEventListener("click", () => {
+    if (usedNumbers.length >= 75) {
+      showAlert("すべての数字が出ました！");
+      return;
+    }
+  
+    let randomNumber;
+    do {
+      randomNumber = Math.floor(Math.random() * 75) + 1;
+    } while (usedNumbers.includes(randomNumber)); // 過去の数字を避ける
+  
+    // ボタンを無効化
+    startBtn.disabled = true;
+    manualBtn.disabled = true;
+    resetBtn.disabled = true;
+  
+    // 数字がランダムに点滅
+    flashNumber(randomNumber);
+  
+    // ボタンを再度有効化 (点滅終了後に行う)
+    setTimeout(() => {
+      startBtn.disabled = false;
+      manualBtn.disabled = false;
+      resetBtn.disabled = false;
+    }, 2000);
+  });
+  
+  manualSubmit.addEventListener("click", () => {
+    const number = parseInt(manualNumberInput.value);
+    if (!number || number < 1 || number > 75 || usedNumbers.includes(number)) {
+      showAlert("1～75の間の数字を入力するか、すでに使用されている数字は入力できません。");
+      return;
+    }
+  
+    manualPopup.style.display = "none";
+    flashNumber(number); // 手動入力時にもランダム点滅
+  });
   
   // 最新の数字を表示
   const displayNumber = (number) => {
@@ -104,8 +148,8 @@ document.addEventListener("DOMContentLoaded", () => {
       numberElement.textContent = usedNumbers[i] || "";
       numberElement.style.backgroundColor = usedNumbers[i] ? getColumnColor(usedNumbers[i]) : "transparent";
       numberElement.style.border = usedNumbers[i] ? "2px solid black" : "none"; // 黒枠を追加
-      numberElement.style.width = "45px";  // 各グリッドの幅
-      numberElement.style.height = "45px"; // 各グリッドの高さ
+      numberElement.style.width = "55px";  // 各グリッドの幅
+      numberElement.style.height = "55px"; // 各グリッドの高さ
       numberElement.style.boxShadow = usedNumbers[i] ? "0 2px 4px rgba(0, 0, 0, 0.2)" : "none"; // 影を削除
       numberElement.addEventListener("click", () => {
         if (isAdmin && usedNumbers[i]) {
