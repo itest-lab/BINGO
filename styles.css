@@ -18,7 +18,7 @@ body {
   align-items: center;
   width: 100%;
   /*padding: -20px;*/
-  margin-left: -10%;
+  margin-left: -5%;
 }
 
 #latest-number {
@@ -31,12 +31,12 @@ body {
 }
 
 #number-box {
-  width: 350px;
-  height: 350px;
+  width: 450px;
+  height: 450px;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 325px; 
+  font-size: 350px; 
   font-weight: bold;
   border-radius: 10px;
   background-color: #e3e3e3;
@@ -82,9 +82,9 @@ body {
 
 #history-grid {
   display: grid;
-  grid-template-columns: repeat(8, 45px);
-  grid-template-rows: repeat(10, 45px);
-  gap: 4px;
+  grid-template-columns: repeat(8, 55px);
+  grid-template-rows: repeat(10, 55px);
+  gap: 6px;
   padding: 20px;
 }
 
@@ -92,8 +92,8 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 45px;
-  height: 45px;
+  width: 55px;
+  height: 55px;
   font-size: 30px;
   font-weight: bold;
   background-color: #e3e3e3;
