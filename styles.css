@@ -1,12 +1,14 @@
 /* 基本設定 */
 body {
   font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 20px 0;
+  margin: 20px;
   background-color: #ffffff;
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 100%;
+  overflow: hidden;
+  height: calc(100vh - 150px);
 }
 
 /* 最新の数字 */
@@ -14,10 +16,9 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: calc(100vh - 150px);
   width: 100%;
-  padding: 20px;
-  margin: auto;
+  /*padding: -20px;*/
+  margin-left: -10%;
 }
 
 #latest-number {
@@ -26,17 +27,16 @@ body {
   flex-direction: column;
   align-items: center;
   flex: 1;
-  max-width: 700px;
-  margin-right: 10px;
+  /*max-width: 1200px;*/
 }
 
 #number-box {
-  width: 700px;
-  height: 700px;
+  width: 350px;
+  height: 350px;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 450px;
+  font-size: 325px; 
   font-weight: bold;
   border-radius: 10px;
   background-color: #e3e3e3;
@@ -54,6 +54,7 @@ body {
   background-color: white;
   border-top: none;
   height: 50px;
+  margin-left: -10%;
 }
 
 #controls button {
@@ -76,22 +77,24 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-top: 15px;
 }
 
 #history-grid {
   display: grid;
-  grid-template-columns: repeat(10, 75px);
-  grid-template-rows: repeat(7, 75px);
-  gap: 10px;
+  grid-template-columns: repeat(8, 45px);
+  grid-template-rows: repeat(10, 45px);
+  gap: 4px;
+  padding: 20px;
 }
 
 .history-number {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 75px;
-  height: 75px;
-  font-size: 50px;
+  width: 45px;
+  height: 45px;
+  font-size: 30px;
   font-weight: bold;
   background-color: #e3e3e3;
   border-radius: 5px;
@@ -111,7 +114,6 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 999;
 }
 
 .popup-content {
@@ -120,14 +122,6 @@ body {
   border-radius: 10px;
   text-align: center;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-#manual-popup .popup-content {
-  z-index: 10;
-}
-
-#delete-confirm-popup .popup-content {
-  z-index: 20;
 }
 
 #manual-popup label {
@@ -142,8 +136,89 @@ body {
   margin-left: 10px;
 }
 
+#manual-popup .popup-content {
+  z-index: 10;
+}
+
 #alert-popup .popup-content, 
 #edit-popup .popup-content,
 #reset-confirm-popup .popup-content {
   z-index: 20;
+}
+
+/* 削除確認ポップアップ */
+#delete-confirm-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* 半透明の黒い背景 */
+  display: none; /* 初期状態で非表示 */
+  justify-content: center;
+  align-items: center;
+  z-index: 30; /* 他の要素より前面に表示 */
+}
+
+/* ポップアップの内容部分 */
+#delete-confirm-popup .popup-content {
+  background: #ffffff; /* 白い背景 */
+  padding: 30px;
+  border-radius: 10px; /* 角を丸くする */
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* ボックスに影を付ける */
+  width: 350px; /* 横幅を固定 */
+  max-width: 90%; /* モバイル対応 */
+  border: 2px solid #ccc; /* 灰色の枠線 */
+}
+
+/* ポップアップ内のタイトル */
+#delete-confirm-popup h2 {
+  font-size: 24px;
+  margin-bottom: 15px;
+  color: #333; /* 濃い灰色の文字色 */
+}
+
+/* ポップアップ内の本文 */
+#delete-confirm-popup p {
+  font-size: 16px;
+  margin-bottom: 25px;
+  color: #666; /* 少し明るい灰色の文字色 */
+}
+
+/* ポップアップ内のボタン */
+#delete-confirm-popup .popup-buttons {
+  display: flex;
+  justify-content: space-around;
+  gap: 10px; /* ボタン間の余白 */
+}
+
+#delete-confirm-popup button {
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+/* 確認ボタンのデザイン */
+#delete-confirm-popup .confirm-btn {
+  background-color: #d9534f; /* 赤色 */
+  color: white;
+}
+
+#delete-confirm-popup .confirm-btn:hover {
+  background-color: #c9302c; /* マウスオーバー時の濃い赤色 */
+}
+
+/* キャンセルボタンのデザイン */
+#delete-confirm-popup .cancel-btn {
+  background-color: #5bc0de; /* 青色 */
+  color: white;
+}
+
+#delete-confirm-popup .cancel-btn:hover {
+  background-color: #31b0d5; /* マウスオーバー時の濃い青色 */
 }
