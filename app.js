@@ -54,19 +54,19 @@ document.addEventListener("DOMContentLoaded", () => {
   // 数字を更新して表示
   const updateNumber = (number) => {
     if (isFlashing) return; // ランダム点滅中は更新しない
-  
+
+    // 「この数字はすでに使用されています。」を回避するために
     if (usedNumbers.includes(number)) {
-      showAlert("この数字はすでに使用されています。");
-      return;
+      return; // 数字が過去に使われている場合は更新しない
     }
-  
+
     usedNumbers.unshift(number); // 最新の数字を先頭に追加
-  
+
     firebase.database().ref("bingo").update({
       latestNumber: number,
       history: usedNumbers,
     });
-  
+
     displayNumber(number);
     updateHistoryGrid();
   };
@@ -79,56 +79,65 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // ランダム点滅後、数字を更新する
   const flashNumber = (latestNumber) => {
     isFlashing = true; // ランダム点滅開始
     let flashInterval = setInterval(() => {
       numberBox.textContent = Math.floor(Math.random() * 75) + 1;
       numberBox.style.backgroundColor = "white";
     }, 100);
-  
+
     // 2秒後に停止して最新の数字を表示
     setTimeout(() => {
       clearInterval(flashInterval);
       displayNumber(latestNumber); // 最新の数字を表示
-      updateNumber(latestNumber); // 履歴を更新
+      
+      // 2秒後に過去の数字を更新
+      setTimeout(() => {
+        updateNumber(latestNumber); // 履歴を更新
+      }, 2000); // 更新を遅らせる
+      
       isFlashing = false; // ランダム点滅終了
-    }, 2000);
+    }, 2000); // 2秒後に更新
   };
   
+  // ランダムスタート
   startBtn.addEventListener("click", () => {
     if (usedNumbers.length >= 75) {
       showAlert("すべての数字が出ました！");
       return;
     }
-  
+
     let randomNumber;
+    // 過去に使用された数字を避けてランダムな数字を生成
     do {
       randomNumber = Math.floor(Math.random() * 75) + 1;
     } while (usedNumbers.includes(randomNumber)); // 過去の数字を避ける
-  
+
     // ボタンを無効化
     startBtn.disabled = true;
     manualBtn.disabled = true;
     resetBtn.disabled = true;
-  
+
     // 数字がランダムに点滅
     flashNumber(randomNumber);
-  
+
     // ボタンを再度有効化 (点滅終了後に行う)
     setTimeout(() => {
       startBtn.disabled = false;
       manualBtn.disabled = false;
       resetBtn.disabled = false;
-    }, 2000);
+    }, 2000); // 2秒後
   });
   
+  // 手動入力ポップアップの「OK」を押した場合
   manualSubmit.addEventListener("click", () => {
     const number = parseInt(manualNumberInput.value);
     if (!number || number < 1 || number > 75 || usedNumbers.includes(number)) {
       showAlert("1～75の間の数字を入力するか、すでに使用されている数字は入力できません。");
       return;
     }
-  
+
     manualPopup.style.display = "none";
     flashNumber(number); // 手動入力時にもランダム点滅
   });
@@ -165,6 +174,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // 管理者ログインポップアップを開く
   adminLoginBtn.addEventListener("click", () => {
     adminPopup.style.display = "flex";
+    adminPasswordInput.focus();
   });
 
   // 管理者ログイン処理
@@ -282,8 +292,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Firebaseから過去の数字をリアルタイムで取得
   firebase.database().ref("bingo/history").on("value", (snapshot) => {
-    usedNumbers = snapshot.val() || [];
-    updateHistoryGrid();
+    setTimeout(() => {
+      usedNumbers = snapshot.val() || [];
+      updateHistoryGrid();
+    }, 2000);
   });
 
   // 過去の数字をクリックして編集
