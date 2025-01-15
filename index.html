@@ -29,9 +29,10 @@
       <button id="start-btn" style="display:none;">ランダムスタート</button>
       <button id="manual-btn" style="display:none;">手動入力</button>
       <button id="reset-btn" style="display:none;">リセット</button>
+      <button id="settings-btn" style="display:none;">設定</button>
     </footer>
     
-    <!-- 数字編集ポップアップに削除ボタンを追加 -->
+    <!-- 数字編集ポップアップ -->
     <div id="edit-popup" class="popup" style="display:none;">
       <div class="popup-content">
         <h2>数字編集</h2>
@@ -47,14 +48,16 @@
         </div>
       </div>
     </div>
-    
+
     <!-- 削除確認ポップアップ -->
-    <div id="delete-confirm-popup" class="popup" style="display:none;">
+    <div id="delete-confirm-popup">
       <div class="popup-content">
-        <h2>削除確認</h2>
-        <p>本当に削除しますか？</p>
-        <button id="confirm-delete-btn">はい</button>
-        <button id="cancel-delete-btn">いいえ</button>
+        <h2>確認</h2>
+        <p>本当にこの数字を削除しますか？</p>
+        <div class="popup-buttons">
+          <button id="confirm-delete-btn" class="confirm-btn">はい</button>
+          <button id="cancel-delete-btn" class="cancel-btn">いいえ</button>
+        </div>
       </div>
     </div>
 
@@ -97,6 +100,23 @@
         <div style="margin-top: 20px; display: flex; justify-content: center;">
           <button id="manual-submit" style="margin-right: 10px;">OK</button>
           <button id="close-manual-popup">キャンセル</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 設定ポップアップ -->
+    <div id="settings-popup" class="popup" style="display:none;">
+      <div class="popup-content">
+        <h2>設定</h2>
+        <label for="random-start-time">ランダムスタートの秒数:</label>
+        <input type="number" id="random-start-time" min="1" value="2">
+        <label for="random-start-time-unit">秒</label>
+        <label for="background-url">背景画像のURL:</label>
+        <input type="text" id="background-url">
+        <p style="font-size: 12px; color: gray;">クラウドに誰でもアクセスできるようにして張り付けてください。<br>背景70％透過して繰り返し配置します。<br>空白にしたら白に設定します。</p>
+        <div style="margin-top: 20px; display: flex; justify-content: center;">
+          <button id="save-settings" style="margin-right: 10px;">保存</button>
+          <button id="close-settings-popup">閉じる</button>
         </div>
       </div>
     </div>
