@@ -18,7 +18,7 @@ body {
   align-items: center;
   width: 100%;
   /*padding: -20px;*/
-  margin-left: -5%;
+  margin-left: -0%;
 }
 
 #latest-number {
@@ -54,7 +54,7 @@ body {
   background-color: white;
   border-top: none;
   height: 50px;
-  margin-left: -10%;
+  margin-left: -3%;
 }
 
 #controls button {
