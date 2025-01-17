@@ -29,12 +29,60 @@ document.addEventListener("DOMContentLoaded", () => {
   const deleteConfirmPopup = document.getElementById("delete-confirm-popup"); 
   const confirmDeleteBtn = document.getElementById("confirm-delete-btn"); 
   const cancelDeleteBtn = document.getElementById("cancel-delete-btn");
-  
+  const settingsbtn = document.getElementById("settings-btn");
+  const settingsPopup = document.getElementById("settings-popup");
+  const randomstarttime = document.getElementById("random-start-time");
+  const closesettingspopup = document.getElementById("close-settings-popup");
+  const saveSettingsBtn = document.getElementById("save-settings");
+  const displayElement = document.getElementById("random-start-time-display");
+
   const db = firebase.database();
   let isAdmin = false;
   let usedNumbers = [];
-  let currentNumber = null;
   let isFlashing = false; // ランダム点滅中かどうかを判定するフラグ
+  // 初回アクセスフラグを追加
+  let isFirstAccess = true;
+  // 秒数設定をデータベースから取得して設定
+  let randomStartTime = 2;
+  db.ref("settings/randomStartTime").on("value", (snapshot) => {
+    if (snapshot.exists()) {;
+      randomstarttime = snapshot.val();
+      updateRandomStartTimeDisplay()
+    }
+  });
+
+  // Firebaseから秒数の同期
+  db.ref("settings/randomStartTime").on("value", (snapshot) => {
+    if (snapshot.exists()) {
+      randomStartTime = snapshot.val();
+    }
+  });
+
+  // Firebaseから最新の数字をリアルタイムで取得
+  firebase.database().ref("bingo/latestNumber").on("value", (snapshot) => {
+    const latestNumber = snapshot.val();
+
+    // 初回アクセス時はフラグを確認し、ランダム点滅をスキップ
+    if (isFirstAccess) {
+      if (latestNumber === null) {
+        updateNumberBox("--"); // null の場合は「--」を表示
+        numberBox.style.backgroundColor = "white";
+      } else {
+        //numberBox.textContent(latestNumber); // 数字を表示
+      }
+      isFirstAccess = false; // フラグを切り替える
+      return; // 初回アクセスではランダム点滅しない
+    }
+
+    // `latestNumber` が null の場合、表示を「--」に更新
+    if (latestNumber === null) {
+      updateNumberBox("--");
+      numberBox.style.backgroundColor = "white";
+    } else {
+      // 2回目以降の更新時にはランダム点滅を行う
+      flashNumber(latestNumber);
+    }
+  });
 
   // アラートを表示する関数
   const showAlert = (message) => {
@@ -71,35 +119,19 @@ document.addEventListener("DOMContentLoaded", () => {
     updateHistoryGrid();
   };
 
-  // Firebaseから最新の数字をリアルタイムで取得
-  firebase.database().ref("bingo/latestNumber").on("value", (snapshot) => {
-    const latestNumber = snapshot.val();
-    if (latestNumber !== null) {
-      flashNumber(latestNumber);
+  // リアルタイムリスナーの設定
+  firebase.database().ref("bingo").on("value", (snapshot) => {
+    const data = snapshot.val();
+
+    if (data) {
+      // 最新の数字を表示
+      displayNumber(data.latestNumber || null);
+
+      // 履歴を更新
+      usedNumbers = data.history || [];
+      updateHistoryGrid();
     }
   });
-
-  // ランダム点滅後、数字を更新する
-  const flashNumber = (latestNumber) => {
-    isFlashing = true; // ランダム点滅開始
-    let flashInterval = setInterval(() => {
-      numberBox.textContent = Math.floor(Math.random() * 75) + 1;
-      numberBox.style.backgroundColor = "white";
-    }, 100);
-
-    // 2秒後に停止して最新の数字を表示
-    setTimeout(() => {
-      clearInterval(flashInterval);
-      displayNumber(latestNumber); // 最新の数字を表示
-      
-      // 2秒後に過去の数字を更新
-      setTimeout(() => {
-        updateNumber(latestNumber); // 履歴を更新
-      }, 2000); // 更新を遅らせる
-      
-      isFlashing = false; // ランダム点滅終了
-    }, 2000); // 2秒後に更新
-  };
   
   // ランダムスタート
   startBtn.addEventListener("click", () => {
@@ -114,21 +146,70 @@ document.addEventListener("DOMContentLoaded", () => {
       randomNumber = Math.floor(Math.random() * 75) + 1;
     } while (usedNumbers.includes(randomNumber)); // 過去の数字を避ける
 
-    // ボタンを無効化
+    // データベースの latestNumber を先に更新
+    firebase.database().ref("bingo").update({
+      latestNumber: randomNumber,
+    });
+
+    // ランダム点滅処理
+    flashNumber(randomNumber, () => {
+      // **ランダム点滅終了後の処理**
+      if (!usedNumbers.includes(randomNumber)) { // 重複追加を防ぐ
+        usedNumbers.unshift(randomNumber); // 最新の数字を先頭に追加
+        firebase.database().ref("bingo").update({
+          history: usedNumbers,
+        });
+      }
+
+      // 最新の数字を表示
+      displayNumber(randomNumber);
+      updateHistoryGrid();
+    });
+
+    // ボタンを一時的に無効化
+    disableButtons();
+  });
+
+  // ボタンを一時的に無効化する関数
+  function disableButtons() {
     startBtn.disabled = true;
     manualBtn.disabled = true;
     resetBtn.disabled = true;
+    settingsbtn.disabled = true;
+  }
 
-    // 数字がランダムに点滅
-    flashNumber(randomNumber);
+  // ボタンを再度有効化する関数
+  function enableButtons() {
+    startBtn.disabled = false;
+    manualBtn.disabled = false;
+    resetBtn.disabled = false;
+    settingsbtn.disabled = false;
+  }
 
-    // ボタンを再度有効化 (点滅終了後に行う)
+  // ランダム点滅処理の関数
+  function flashNumber(targetNumber, callback) {
+    isFlashing = true;
+    let flashInterval = setInterval(() => {
+      numberBox.textContent = Math.floor(Math.random() * 75) + 1; // 点滅中にランダム数字を表示
+      numberBox.style.backgroundColor = "white"; // 点滅中は白背景
+    }, 100);
+
+    // 点滅時間終了後に停止
     setTimeout(() => {
-      startBtn.disabled = false;
-      manualBtn.disabled = false;
-      resetBtn.disabled = false;
-    }, 2000); // 2秒後
-  });
+      clearInterval(flashInterval);
+      isFlashing = false; // ランダム点滅終了
+
+      // 点滅終了後に最新の数字を確実に表示
+      numberBox.textContent = targetNumber;
+      numberBox.style.backgroundColor = getColumnColor(targetNumber); // 該当の色を設定
+
+      // コールバック関数を呼び出し
+      callback();
+
+      // ボタンを再度有効化
+      enableButtons();
+    }, randomStartTime * 1000);
+  }
   
   // 手動入力ポップアップの「OK」を押した場合
   manualSubmit.addEventListener("click", () => {
@@ -186,13 +267,48 @@ document.addEventListener("DOMContentLoaded", () => {
       startBtn.style.display = "inline-block";
       manualBtn.style.display = "inline-block";
       resetBtn.style.display = "inline-block";
+      settingsbtn.style.display = "inline-block";
       controls.style.display = "flex"; // フッターに表示
       adminPopup.style.display = "none";
+      displayElement.style.display ="inline-block";
+      updateRandomStartTimeDisplay();
+
     } else {
       showAlert("パスワードが間違っています！");
     }
   });
 
+  settingsbtn.addEventListener("click", () => {
+    settingsPopup.style.display = "flex";
+    randomstarttime.value = randomStartTime;
+  });
+
+  const updateRandomStartTimeDisplay = () => {
+    displayElement.textContent = `現在の秒数: ${randomStartTime}秒`;
+  };
+
+  // 設定保存
+  saveSettingsBtn.addEventListener("click", () => {
+    const newTime = parseInt(document.getElementById("random-start-time").value);
+    if (newTime >= 1) {
+      db.ref("settings/randomStartTime").set(newTime);
+      showAlert("設定を保存しました！");
+      settingsPopup.style.display = "none";
+  
+      // 秒数表示エリアを更新
+      randomStartTime = newTime;
+      updateRandomStartTimeDisplay();
+    } else {
+      showAlert("秒数は1以上で入力してください。");
+    }
+  });
+
+  // 設定ポップアップを閉じる
+  closesettingspopup.addEventListener("click", () => {
+    settingsPopup.style.display = "none";
+  });
+
+  // 管理者ログインポップアップを閉じる
   closePopupBtn.addEventListener("click", () => {
     adminPopup.style.display = "none";
   });
@@ -200,6 +316,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // 数字編集ポップアップを閉じる
   closeEditPopup.addEventListener("click", () => {
     editPopup.style.display = "none";
+
   });
 
   // アラートポップアップを閉じる
@@ -218,6 +335,7 @@ document.addEventListener("DOMContentLoaded", () => {
     firebase.database().ref("bingo").set({
       latestNumber: null,
       history: [],
+
     });
     displayNumber(null);
     updateHistoryGrid();
@@ -245,57 +363,23 @@ document.addEventListener("DOMContentLoaded", () => {
     manualPopup.style.display = "none";
   });
 
-  // 手動入力ポップアップの「キャンセル」を押した場合
+  // 手動入力ポップアップを閉じる
   closeManualPopup.addEventListener("click", () => {
     manualPopup.style.display = "none";
   });
 
-  // ランダムスタート
-  startBtn.addEventListener("click", () => {
-    if (usedNumbers.length >= 75) {
-      showAlert("すべての数字が出ました！");
-      return;
+  // 数字ボックスを更新する関数
+  function updateNumberBox(content) {
+    const numberBox = document.getElementById("number-box");
+    if (numberBox) {
+      numberBox.textContent = content; // 数字を更新
     }
-
-    let randomNumber;
-    do {
-      randomNumber = Math.floor(Math.random() * 75) + 1;
-    } while (usedNumbers.includes(randomNumber));
-
-    // ボタンを無効化
-    startBtn.disabled = true;
-    manualBtn.disabled = true;
-    resetBtn.disabled = true;
-
-    // 数字がランダムに点滅
-    let flashInterval = setInterval(() => {
-      numberBox.textContent = Math.floor(Math.random() * 75) + 1;
-      numberBox.style.backgroundColor = "white";
-    }, 100);
-
-    setTimeout(() => {
-      clearInterval(flashInterval);
-      numberBox.style.backgroundColor = getColumnColor(randomNumber);
-      updateNumber(randomNumber);
-      // ボタンを再度有効化
-      startBtn.disabled = false;
-      manualBtn.disabled = false;
-      resetBtn.disabled = false;
-    }, 2000);
-  });
-
-  // Firebaseから最新の数字をリアルタイムで取得
-  firebase.database().ref("bingo/latestNumber").on("value", (snapshot) => {
-    const latestNumber = snapshot.val();
-    displayNumber(latestNumber);
-  });
+  }
 
   // Firebaseから過去の数字をリアルタイムで取得
   firebase.database().ref("bingo/history").on("value", (snapshot) => {
-    setTimeout(() => {
       usedNumbers = snapshot.val() || [];
       updateHistoryGrid();
-    }, 2000);
   });
 
   // 過去の数字をクリックして編集
@@ -323,11 +407,6 @@ document.addEventListener("DOMContentLoaded", () => {
     editPopup.style.display = "none";
     updateHistoryGrid();
     displayNumber(usedNumbers[0]); // 最新の数字を更新して表示
-  });
-
-  // アラートポップアップを閉じる
-  closeAlertPopup.addEventListener("click", () => {
-    alertPopup.style.display = "none";
   });
   
   // 数字削除ボタンの処理
@@ -361,9 +440,9 @@ document.addEventListener("DOMContentLoaded", () => {
     displayNumber(usedNumbers[0] || "--"); // 最新の数字を更新して表示
   });
 
-  // 削除確認ポップアップで「いいえ」を押した場合
+  // 削除確認ポップアップを閉じる
   cancelDeleteBtn.addEventListener("click", () => {
-    deleteConfirmPopup.style.display = "none"; // 削除確認ポップアップを閉じる
+    deleteConfirmPopup.style.display = "none";
   });
 
 });
