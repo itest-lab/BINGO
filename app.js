@@ -50,6 +50,12 @@ document.addEventListener("DOMContentLoaded", () => {
       updateRandomStartTimeDisplay()
     }
   });
+  // Firebaseから秒数の同期
+  db.ref("settings/randomStartTime").on("value", (snapshot) => {
+    if (snapshot.exists()) {
+      randomStartTime = snapshot.val();
+    }
+  });
 
   // Firebaseから最新の数字をリアルタイムで取得
   firebase.database().ref("bingo/latestNumber").on("value", (snapshot) => {
