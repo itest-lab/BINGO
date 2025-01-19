@@ -15,6 +15,14 @@
         <!-- 最新の数字 -->
         <div id="latest-number">
           <div id="number-box">--</div>
+          <div id="controls">
+            <button id="admin-login-btn">管理者ログイン</button>
+            <button id="start-btn" style="display:none;">ランダムスタート</button>
+            <div id="random-start-time-display" class="break" style="margin-top: 10px; font-weight: bold; display:none;"></div>
+            <button id="manual-btn" style="display:none;">手動入力</button>
+            <button id="reset-btn" style="display:none;">リセット</button>
+            <button id="settings-btn" style="display:none;">設定</button>
+          </div>
         </div>
         <!-- 過去の数字 -->
         <div id="history-container">
@@ -24,15 +32,7 @@
     </main>
 
     <!-- 管理者ログインポップアップ -->
-    <footer id="controls" style="display:flex; justify-content: left; background-color: white; height: 50px;">
-      <button id="admin-login-btn">管理者ログイン</button>
-      <button id="start-btn" style="display:none;">ランダムスタート</button>
-      <div id="random-start-time-display" style="margin-top: 10px; font-weight: bold; display:none;"></div>
-      <button id="manual-btn" style="display:none;">手動入力</button>
-      <button id="reset-btn" style="display:none;">リセット</button>
-      <button id="settings-btn" style="display:none;">設定</button>
-    </footer>
-    
+        
     <!-- 数字編集ポップアップ -->
     <div id="edit-popup" class="popup" style="display:none;">
       <div class="popup-content">
