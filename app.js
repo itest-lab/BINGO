@@ -219,8 +219,20 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    manualPopup.style.display = "none";
-    flashNumber(number); // 手動入力時にもランダム点滅
+    // ランダム点滅処理
+    flashNumber(number, () => {
+      // **ランダム点滅終了後の処理**
+      if (!usedNumbers.includes(number)) { // 重複追加を防ぐ
+        usedNumbers.unshift(number); // 最新の数字を先頭に追加
+        firebase.database().ref("bingo").update({
+          history: usedNumbers,
+        });
+      }
+
+      // 最新の数字を表示
+      displayNumber(number);
+      updateHistoryGrid();
+    });
   });
   
   // 最新の数字を表示
