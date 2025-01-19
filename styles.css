@@ -2,22 +2,23 @@
 body {
   font-family: Arial, sans-serif;
   margin: 20px;
-  background-color: #ffffff;
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100%;
   overflow: hidden;
   height: calc(100vh - 150px);
+  background-image: url('https://raw.githubusercontent.com/itest-lab/bingo/main/asset/image.jpg'); 
+  background-size: cover; /* 画像を画面全体に表示 */ 
+  background-position: center; /* 画像を中央に配置 */
 }
 
 /* 最新の数字 */
 #main-container {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: top;
   width: 100%;
-  /*padding: -20px;*/
   margin-left: -0%;
 }
 
@@ -27,10 +28,10 @@ body {
   flex-direction: column;
   align-items: center;
   flex: 1;
-  /*max-width: 1200px;*/
 }
 
 #number-box {
+  margin-top: 36px;
   width: 450px;
   height: 450px;
   display: flex;
@@ -45,30 +46,39 @@ body {
   transition: background-color 0.3s ease;
 }
 
-/* 管理者コントロール */
-#controls {
-  width: 100%;
-  display: flex;
-  justify-content: left;
-  padding: 10px;
-  background-color: white;
-  border-top: none;
-  height: 50px;
-  margin-left: -3%;
-}
-
-#controls button {
-  margin: 0 10px;
-  padding: 5px 10px;
+/* 管理者ログインボタン */
+#admin-login-btn {
+  margin-top: 20px;
+  padding: 10px 20px;
   border: none;
   border-radius: 5px;
-  background-color: #007bff;
+  background-color: rgba(0, 0, 0, 0.5); /* ブラック50% */
   color: white;
   cursor: pointer;
 }
 
-#controls button:hover {
-  background-color: #0056b3;
+/* 管理者コントロール */
+#controls {
+  display: flex;
+  flex-wrap: wrap; /* 幅を超えた場合に改行する */
+  justify-content: left;
+  padding: 10px;
+  background-color: rgba(255, 255, 255, 0); /* 背景を透明にする */
+  border-top: none;
+  height: auto; /* 自動で高さ調整 */
+  margin-left: -3%;
+  margin-top: 100px;
+  width: 450px;
+}
+
+#controls button {
+  margin: 10px;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: rgba(0, 0, 0, 0.5); /* ブラック50% */
+  color: white;
+  cursor: pointer;
 }
 
 /* 過去の数字 */
@@ -209,9 +219,6 @@ body {
   color: white;
 }
 
-#delete-confirm-popup .confirm-btn:hover {
-  background-color: #c9302c; /* マウスオーバー時の濃い赤色 */
-}
 
 /* キャンセルボタンのデザイン */
 #delete-confirm-popup .cancel-btn {
@@ -219,19 +226,12 @@ body {
   color: white;
 }
 
-#delete-confirm-popup .cancel-btn:hover {
-  background-color: #31b0d5; /* マウスオーバー時の濃い青色 */
-}
-
 #settings-btn {
   margin-top: 10px;
   padding: 10px 20px;
-  background-color: #007bff;
+  background-color: rgba(0, 0, 0, 0.5); /* ブラック50% */
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-}
-#settings-btn:hover {
-  background-color: #0056b3;
 }
