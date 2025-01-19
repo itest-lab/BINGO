@@ -249,15 +249,23 @@ document.addEventListener("DOMContentLoaded", () => {
       numberElement.className = "history-number";
       numberElement.textContent = usedNumbers[i] || "";
       numberElement.style.backgroundColor = usedNumbers[i] ? getColumnColor(usedNumbers[i]) : "transparent";
-      numberElement.style.border = usedNumbers[i] ? "2px solid black" : "none"; // 黒枠を追加
-      numberElement.style.width = "55px";  // 各グリッドの幅
-      numberElement.style.height = "55px"; // 各グリッドの高さ
-      numberElement.style.boxShadow = usedNumbers[i] ? "0 2px 4px rgba(0, 0, 0, 0.2)" : "none"; // 影を削除
+      numberElement.style.border = usedNumbers[i] ? "2px solid black" : "none";
+      numberElement.style.width = "55px";
+      numberElement.style.height = "55px";
+      numberElement.style.boxShadow = usedNumbers[i] ? "0 2px 4px rgba(0, 0, 0, 0.2)" : "none";
+
+      // 数字をデータ属性として保持
+      if (usedNumbers[i]) {
+        numberElement.setAttribute("data-number", usedNumbers[i]);
+      }
+
       numberElement.addEventListener("click", () => {
         if (isAdmin && usedNumbers[i]) {
-          selectedNumberLabel.textContent = `選択した数字: ${usedNumbers[i]}`;
-          editNumberInput.value = usedNumbers[i];
-          editPopup.style.display = "flex"; // ポップアップを表示
+          // クリックした数字をラベルに表示
+          const selectedNumber = numberElement.getAttribute("data-number");
+          selectedNumberLabel.textContent = `選択した数字: ${selectedNumber}`;
+          editNumberInput.value = selectedNumber;
+          editPopup.style.display = "flex";
         }
       });
       historyGrid.appendChild(numberElement);
@@ -394,31 +402,39 @@ document.addEventListener("DOMContentLoaded", () => {
       updateHistoryGrid();
   });
 
-  // 過去の数字をクリックして編集
+  // 編集ポップアップの「OK」ボタン処理
   editSubmit.addEventListener("click", () => {
     const newNumber = parseInt(editNumberInput.value);
-    if (!newNumber || newNumber < 1 || newNumber > 75 || usedNumbers.includes(newNumber)) {
-      showAlert("1～75の間の数字を入力するか、すでに使用されている数字は入力できません。");
-      return;
-    }
-
     const oldNumber = parseInt(selectedNumberLabel.textContent.replace("選択した数字: ", ""));
-    const index = usedNumbers.indexOf(oldNumber);
-    if (index > -1 && index !== 0) { // 一番左上の数字を変更しない
-      usedNumbers[index] = newNumber;
-    } else {
-      showAlert("この数字は変更できません。");
+
+    // 入力値のバリデーション
+    if (!newNumber || newNumber < 1 || newNumber > 75) {
+      showAlert("1～75の間の数字を入力してください。");
+      return;
+    }
+    if (usedNumbers.includes(newNumber)) {
+      showAlert("この数字はすでに使用されています。");
       return;
     }
 
-    firebase.database().ref("bingo").update({
-      latestNumber: usedNumbers[0], // 一番左上の数字を保持
-      history: usedNumbers,
-    });
+    // 古い数字の位置を特定して更新
+    const index = usedNumbers.indexOf(oldNumber);
+    if (index > -1) {
+      usedNumbers[index] = newNumber;
 
-    editPopup.style.display = "none";
-    updateHistoryGrid();
-    displayNumber(usedNumbers[0]); // 最新の数字を更新して表示
+      // Firebase更新
+      firebase.database().ref("bingo").update({
+        history: usedNumbers,
+        latestNumber: usedNumbers[0], // 最新の数字を保持
+      });
+
+      // ポップアップを閉じる & UI更新
+      editPopup.style.display = "none";
+      updateHistoryGrid();
+      displayNumber(usedNumbers[0]);
+    } else {
+      showAlert("選択した数字を変更できません。");
+    }
   });
   
   // 数字削除ボタンの処理
