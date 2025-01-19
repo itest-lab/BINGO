@@ -86,8 +86,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // アラートを表示する関数
   const showAlert = (message) => {
+    // 他のポップアップを後ろに下げる（初期化）
+    const allPopups = document.querySelectorAll(".popup");
+    allPopups.forEach(popup => {
+      popup.style.zIndex = 10; // 基本の z-index
+    });
+
+    // アラートポップアップを最前面に設定
     alertMessage.textContent = message;
-    alertPopup.style.display = "flex";
+    alertPopup.style.zIndex = 50; // 他のポップアップより前
+    alertPopup.style.display = "flex"; // 表示する
   };
 
   // 数字の列に応じた色を取得
@@ -150,6 +158,7 @@ document.addEventListener("DOMContentLoaded", () => {
     firebase.database().ref("bingo").update({
       latestNumber: randomNumber,
     });
+    numberBox.style.backgroundColor = "white"; // 白背景
 
     // ランダム点滅処理
     flashNumber(randomNumber, () => {
@@ -225,6 +234,7 @@ document.addEventListener("DOMContentLoaded", () => {
     firebase.database().ref("bingo").update({
       latestNumber: number,
     });
+    numberBox.style.backgroundColor = "white"; // 白背景
 
     // ランダム点滅処理
     flashNumber(number, () => {
