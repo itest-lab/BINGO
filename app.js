@@ -50,6 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
       updateRandomStartTimeDisplay()
     }
   });
+
   // Firebaseから秒数の同期
   db.ref("settings/randomStartTime").on("value", (snapshot) => {
     if (snapshot.exists()) {
@@ -60,29 +61,27 @@ document.addEventListener("DOMContentLoaded", () => {
   // Firebaseから最新の数字をリアルタイムで取得
   firebase.database().ref("bingo/latestNumber").on("value", (snapshot) => {
     const latestNumber = snapshot.val();
-  
+
+    // 初回アクセス時はフラグを確認し、ランダム点滅をスキップ
+    if (isFirstAccess) {
+      if (latestNumber === null) {
+        updateNumberBox("--"); // null の場合は「--」を表示
+        numberBox.style.backgroundColor = "white";
+      } else {
+        //numberBox.textContent(latestNumber); // 数字を表示
+      }
+      isFirstAccess = false; // フラグを切り替える
+      return; // 初回アクセスではランダム点滅しない
+    }
+
+    // `latestNumber` が null の場合、表示を「--」に更新
     if (latestNumber === null) {
-      // 最新の数字がnullの場合、表示をリセット
       updateNumberBox("--");
       numberBox.style.backgroundColor = "white";
-      isFirstAccess = false; // 初回アクセスのフラグを解除
-      return;
+    } else {
+      // 2回目以降の更新時にはランダム点滅を行う
+      flashNumber(latestNumber);
     }
-  
-    if (isFirstAccess) {
-      // 初回アクセス時はランダム点滅させず、直接数字を更新
-      updateNumberBox(latestNumber);
-      numberBox.style.backgroundColor = getColumnColor(latestNumber);
-      isFirstAccess = false; // 初回アクセスのフラグを解除
-      return;
-    }
-  
-    // 2回目以降はランダム点滅を実行
-    flashNumber(latestNumber, () => {
-      // 点滅終了後、数字を最新の状態に更新
-      updateNumberBox(latestNumber);
-      numberBox.style.backgroundColor = getColumnColor(latestNumber);
-    });
   });
 
   // アラートを表示する関数
@@ -187,63 +186,59 @@ document.addEventListener("DOMContentLoaded", () => {
     settingsbtn.disabled = false;
   }
 
-  // 数字をランダムに点滅させる処理
+  // ランダム点滅処理の関数
   function flashNumber(targetNumber, callback) {
-    isFlashing = true; // 点滅中のフラグを設定
+    isFlashing = true;
     let flashInterval = setInterval(() => {
-      numberBox.textContent = Math.floor(Math.random() * 75) + 1; // ランダムな数字を表示
+      numberBox.textContent = Math.floor(Math.random() * 75) + 1; // 点滅中にランダム数字を表示
       numberBox.style.backgroundColor = "white"; // 点滅中は白背景
     }, 100);
 
-    // ランダム点滅を一定時間実行後に停止
+    // 点滅時間終了後に停止
     setTimeout(() => {
-      clearInterval(flashInterval); // 点滅を停止
-      isFlashing = false; // 点滅中のフラグを解除
+      clearInterval(flashInterval);
+      isFlashing = false; // ランダム点滅終了
 
-      // 点滅終了後に目標の数字を表示
+      // 点滅終了後に最新の数字を確実に表示
       numberBox.textContent = targetNumber;
-      numberBox.style.backgroundColor = getColumnColor(targetNumber);
+      numberBox.style.backgroundColor = getColumnColor(targetNumber); // 該当の色を設定
 
-      // コールバック関数を実行
-      if (callback) callback();
+      // コールバック関数を呼び出し
+      callback();
+
+      // ボタンを再度有効化
+      enableButtons();
     }, randomStartTime * 1000);
   }
   
-  // 手動入力ポップアップの「OK」ボタンの処理
+  // 手動入力ポップアップの「OK」を押した場合
   manualSubmit.addEventListener("click", () => {
     const number = parseInt(manualNumberInput.value);
-
-    // 入力値のバリデーション
     if (!number || number < 1 || number > 75 || usedNumbers.includes(number)) {
       showAlert("1～75の間の数字を入力するか、すでに使用されている数字は入力できません。");
       return;
     }
 
-    // ボタンを無効化して操作を一時的に制限
     disableButtons();
 
-    // FirebaseのlatestNumberを先に更新
+    // データベースの latestNumber を先に更新
     firebase.database().ref("bingo").update({
       latestNumber: number,
     });
 
-    // ランダム点滅処理を実行
+    // ランダム点滅処理
     flashNumber(number, () => {
-      // 点滅終了後に履歴を更新
-      if (!usedNumbers.includes(number)) {
-        usedNumbers.unshift(number); // 最新の数字を履歴に追加
+      // **ランダム点滅終了後の処理**
+      if (!usedNumbers.includes(number)) { // 重複追加を防ぐ
+        usedNumbers.unshift(number); // 最新の数字を先頭に追加
         firebase.database().ref("bingo").update({
           history: usedNumbers,
         });
       }
 
-      // UIを更新
+      // 最新の数字を表示
       displayNumber(number);
       updateHistoryGrid();
-
-      // ボタンを再有効化
-      enableButtons();
-      manualPopup.style.display = "none";
     });
   });
   
