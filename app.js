@@ -80,7 +80,9 @@ document.addEventListener("DOMContentLoaded", () => {
       numberBox.style.backgroundColor = "white";
     } else {
       // 2回目以降の更新時にはランダム点滅を行う
+      numberBox.style.backgroundColor = "white"; // 白背景
       flashNumber(latestNumber);
+      numberBox.style.backgroundColor = "white"; // 白背景
     }
   });
 
