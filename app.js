@@ -60,15 +60,24 @@ document.addEventListener("DOMContentLoaded", () => {
   // Firebaseから最新の数字をリアルタイムで取得
   firebase.database().ref("bingo/latestNumber").on("value", (snapshot) => {
     const latestNumber = snapshot.val();
-
+  
     if (latestNumber === null) {
       // 最新の数字がnullの場合、表示をリセット
       updateNumberBox("--");
       numberBox.style.backgroundColor = "white";
+      isFirstAccess = false; // 初回アクセスのフラグを解除
       return;
     }
-
-    // ランダム点滅を強制的に実行
+  
+    if (isFirstAccess) {
+      // 初回アクセス時はランダム点滅させず、直接数字を更新
+      updateNumberBox(latestNumber);
+      numberBox.style.backgroundColor = getColumnColor(latestNumber);
+      isFirstAccess = false; // 初回アクセスのフラグを解除
+      return;
+    }
+  
+    // 2回目以降はランダム点滅を実行
     flashNumber(latestNumber, () => {
       // 点滅終了後、数字を最新の状態に更新
       updateNumberBox(latestNumber);
