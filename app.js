@@ -219,6 +219,11 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+    // データベースの latestNumber を先に更新
+    firebase.database().ref("bingo").update({
+      latestNumber: number,
+    });
+
     // ランダム点滅処理
     flashNumber(number, () => {
       // **ランダム点滅終了後の処理**
