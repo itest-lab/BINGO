@@ -125,6 +125,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     displayNumber(number);
+    enableButtons();
     updateHistoryGrid();
   };
 
@@ -205,29 +206,29 @@ document.addEventListener("DOMContentLoaded", () => {
   // ランダム点滅処理の関数
   function flashNumber(targetNumber, callback) {
     isFlashing = true;
-
+  
     // ボタンを無効化
     disableButtons();
-
+    
+    // ランダム点滅を開始する直前に文字色を黒に設定
+    numberBox.style.color = "black";
+    
     let flashInterval = setInterval(() => {
       numberBox.textContent = Math.floor(Math.random() * 75) + 1; // 点滅中にランダム数字を表示
-      numberBox.style.backgroundColor = "white"; // 点滅中は白背景
-      numberBox.style.color = "black" // ランダム点滅を開始する直前に文字色を黒に設定
     }, 100);
-
+  
     // 点滅時間終了後に停止
     setTimeout(() => {
       clearInterval(flashInterval);
       isFlashing = false; // ランダム点滅終了
-
-      // 点滅終了後に最新の数字を確実に表示
+  
+      // 点滅終了後に最終的な数字と文字色を設定
       numberBox.textContent = targetNumber;
-      numberBox.style.backgroundColor = getColumnColor(targetNumber); // 該当の色を設定
-      numberBox.style.color = "#fbcf87"; 
-
+      numberBox.style.color = "#fbcf87"; // 文字色を#fbcf87に変更
+  
       // コールバック関数を呼び出し
       callback();
-
+  
       // ボタンを再度有効化
       enableButtons();
     }, randomStartTime * 1000);
@@ -414,8 +415,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     updateNumber(number);
     manualPopup.style.display = "none";
-
-    enableButtons();
   });
 
   // 手動入力ポップアップを閉じる
