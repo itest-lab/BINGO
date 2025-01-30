@@ -125,7 +125,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     displayNumber(number);
-    enableButtons();
     updateHistoryGrid();
   };
 
@@ -183,8 +182,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       updateHistoryGrid();
     });
-
-    enableButtons();
   });
   
   // ボタンを一時的に無効化する関数
