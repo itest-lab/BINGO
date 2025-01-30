@@ -303,22 +303,47 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // 管理者ログイン処理
-  adminLoginSubmit.addEventListener("click", () => {
-    const password = adminPasswordInput.value;
-    if (password === "admin123") {
-      showAlert("管理者ログイン成功！");
-      isAdmin = true;
-      startBtn.style.display = "inline-block";
-      manualBtn.style.display = "inline-block";
-      resetBtn.style.display = "inline-block";
-      settingsbtn.style.display = "inline-block";
-      controls.style.display = "flex"; // フッターに表示
-      adminPopup.style.display = "none";
-      displayElement.style.display ="inline-block";
-      updateRandomStartTimeDisplay();
+  adminLoginSubmit.addEventListener("click", async () => {
+    const password = adminPasswordInput.value; // 入力されたパスワード
 
-    } else {
-      showAlert("パスワードが間違っています！");
+    try {
+      // Firebaseからハッシュ化されたパスワードを取得
+      const snapshot = await firebase.database().ref("admin/passwordHash").once("value");
+
+      if (snapshot.exists()) {
+        const storedHash = snapshot.val(); // Firebaseに保存されたハッシュ値
+
+        // bcrypt が正しく読み込まれているかチェック
+        if (!window.bcrypt) {
+          console.error("bcrypt.js が読み込まれていません！");
+          showAlert("認証エラーが発生しました。ページをリロードしてください。");
+          return;
+        }
+
+        // bcrypt でパスワードを照合
+        const match = await window.bcrypt.compare(password, storedHash);
+        if (match) {
+          showAlert("管理者ログイン成功！");
+          isAdmin = true;
+
+          // 管理者メニューを表示
+          startBtn.style.display = "inline-block";
+          manualBtn.style.display = "inline-block";
+          resetBtn.style.display = "inline-block";
+          settingsbtn.style.display = "inline-block";
+          controls.style.display = "flex"; // フッターに表示
+          adminPopup.style.display = "none";
+          displayElement.style.display = "inline-block";
+          updateRandomStartTimeDisplay();
+        } else {
+          showAlert("パスワードが間違っています！");
+        }
+      } else {
+        showAlert("管理者情報が見つかりません。");
+      }
+    } catch (error) {
+      console.error("認証エラー:", error);
+      showAlert("認証中にエラーが発生しました。");
     }
   });
 
