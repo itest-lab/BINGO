@@ -156,6 +156,8 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
   
+    disableButtons(); // ボタンを無効化
+
     let randomNumber;
     // 過去に使用された数字を避けてランダムな数字を生成
     do {
@@ -201,6 +203,10 @@ document.addEventListener("DOMContentLoaded", () => {
   // ランダム点滅処理の関数
   function flashNumber(targetNumber, callback) {
     isFlashing = true;
+
+    // ボタンを無効化
+    disableButtons();
+
     let flashInterval = setInterval(() => {
       numberBox.textContent = Math.floor(Math.random() * 75) + 1; // 点滅中にランダム数字を表示
       numberBox.style.backgroundColor = "white"; // 点滅中は白背景
