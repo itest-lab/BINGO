@@ -46,8 +46,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // 秒数設定をデータベースから取得して設定
   let randomStartTime = 2;
 
-  console.log("bcrypt ロードチェック:", window.bcrypt);
-
   db.ref("settings/randomStartTime").on("value", (snapshot) => {
     if (snapshot.exists()) {;
       randomstarttime = snapshot.val();
@@ -305,37 +303,42 @@ document.addEventListener("DOMContentLoaded", () => {
     adminPasswordInput.focus();
   });
 
-  // 管理者ログイン処理
-  adminLoginSubmit.addEventListener("click", () => {
-    const password = adminPasswordInput.value; // ユーザーが入力したパスワード
+  // ログイン時のパスワード認証
+  async function verifyAdminPassword(inputPassword) {
+    const snapshot = await firebase.database().ref("admin/password").once("value");
+    if (!snapshot.exists()) {
+      showAlert("管理者パスワードが設定されていません！");
+      return false;
+    }
+  
+    const storedHash = snapshot.val();
+    const inputHash = await hashPassword(inputPassword);
+  
+    if (inputHash === storedHash) {
+      showAlert("管理者ログイン成功！");
+      isAdmin = true;
 
-    // Firebaseからハッシュ化されたパスワードを取得
-    firebase.database().ref("admin/passwordHash").once("value", async (snapshot) => {
-      if (snapshot.exists()) {
-        const storedHash = snapshot.val(); // Firebaseに保存されたハッシュ値
+      // 管理者メニューを表示
+      startBtn.style.display = "inline-block";
+      manualBtn.style.display = "inline-block";
+      resetBtn.style.display = "inline-block";
+      settingsbtn.style.display = "inline-block";
+      controls.style.display = "flex"; // フッターに表示
+      adminPopup.style.display = "none";
+      displayElement.style.display = "inline-block";
+      updateRandomStartTimeDisplay();
 
-        // bcrypt でパスワードを照合
-        const match = storedHash
-        if (match) {
-          showAlert("管理者ログイン成功！");
-          isAdmin = true;
+      return true;
+    } else {
+      showAlert("パスワードが間違っています！");
+      return false;
+    }
+  }
 
-          // 管理者メニューを表示
-          startBtn.style.display = "inline-block";
-          manualBtn.style.display = "inline-block";
-          resetBtn.style.display = "inline-block";
-          settingsbtn.style.display = "inline-block";
-          controls.style.display = "flex"; // フッターに表示
-          adminPopup.style.display = "none";
-          displayElement.style.display = "inline-block";
-          updateRandomStartTimeDisplay();
-        } else {
-          showAlert("パスワードが間違っています！");
-        }
-      } else {
-        showAlert("管理者情報が見つかりません。");
-      }
-    });
+  // 管理者ログインボタンの処理
+  adminLoginSubmit.addEventListener("click", async () => {
+    const password = adminPasswordInput.value;
+    await verifyAdminPassword(password);
   });
 
   settingsbtn.addEventListener("click", () => {
