@@ -182,6 +182,8 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       updateHistoryGrid();
     });
+
+    enableButtons();
   });
   
   // ボタンを一時的に無効化する関数
@@ -407,8 +409,13 @@ document.addEventListener("DOMContentLoaded", () => {
       showAlert("1～75の間の数字を入力するか、すでに使用されている数字は入力できません。");
       return;
     }
+
+    disableButtons();
+
     updateNumber(number);
     manualPopup.style.display = "none";
+
+    enableButtons();
   });
 
   // 手動入力ポップアップを閉じる
