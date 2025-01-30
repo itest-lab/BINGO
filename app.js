@@ -500,6 +500,7 @@ document.addEventListener("DOMContentLoaded", () => {
     editPopup.style.display = "none"; // 数字編集ポップアップを閉じる
     updateHistoryGrid();
     displayNumber(usedNumbers[0] || "--"); // 最新の数字を更新して表示
+    enableButtons();
   });
 
   // 削除確認ポップアップを閉じる
