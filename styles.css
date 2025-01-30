@@ -1,25 +1,31 @@
 /* 基本設定 */
 body {
-  font-family: Arial, sans-serif;
-  margin: 35px;
-  margin-top: 55px;
+  /*font-family: Arial, sans-serif;*/
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100%;
   overflow: hidden;
-  height: calc(100vh - 150px);
+  min-height: 100vh; /* 画面全体の高さを確保 */
   background-image: url('https://raw.githubusercontent.com/itest-lab/bingo/main/asset/image.jpg'); 
   background-size: cover; /* 画像を画面全体に表示 */ 
   background-position: center; /* 画像を中央に配置 */
+  background-attachment: fixed; /* 背景を固定 */
+}
+
+@font-face {
+  font-family: 'CustomFont';
+  src: url('https://raw.githubusercontent.com/itest-lab/bingo/main/asset/font.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
 }
 
 /* 最新の数字 */
 #main-container {
   display: flex;
-  justify-content: space-between;
-  width: 100%;
-  margin-left: -0%;
+  justify-content: center; /* 横方向の中央配置 */
+  /*width: 100%;
+  margin-left: -0%;*/
 }
 
 #latest-number {
@@ -31,7 +37,7 @@ body {
 }
 
 #number-box {
-  margin-top: 20px;
+  font-family: 'CustomFont', sans-serif;
   width: 450px;
   height: 450px;
   display: flex;
@@ -41,7 +47,8 @@ body {
   font-weight: bold;
   border-radius: 10px;
   background-color: #e3e3e3;
-  border: 2px solid black;
+  color: #fbcf87;
+  /*border: 2px solid black;*/
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   transition: background-color 0.3s ease;
 }
@@ -67,7 +74,7 @@ body {
   border-top: none;
   height: auto; /* 自動で高さ調整 */
   margin-left: -3%;
-  margin-top: 100px;
+  margin-top: 140px;
   width: 450px;
 }
 
@@ -91,13 +98,15 @@ body {
 
 #history-grid {
   display: grid;
-  grid-template-columns: repeat(8, 55px);
-  grid-template-rows: repeat(10, 55px);
+  grid-template-columns: repeat(10, 55px);
+  grid-template-rows: repeat(8, 55px);
   gap: 6px;
   padding: 20px;
+  margin-top: -20px;
 }
 
 .history-number {
+  font-family: 'CustomFont', sans-serif;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -105,11 +114,12 @@ body {
   height: 55px;
   font-size: 40px;
   font-weight: bold;
+  color: #fbcf87;
   background-color: #e3e3e3;
   border-radius: 5px;
-  border: 2px solid black;
-  cursor: pointer;
+  /*border: 2px solid black;*/
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
 }
 
 /* ポップアップ */
@@ -138,7 +148,7 @@ body {
 }
 
 #manual-popup input[type="number"] {
-  margin-bottom: 20px;
+  margin-bottom: 0px;
 }
 
 #manual-popup button {
