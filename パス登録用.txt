@@ -13,4 +13,4 @@
     firebase.database().ref("admin/password").set(hashedPassword);
   }
 
-  saveAdminPassword("admin123"); // 初回のみ実行（実際は強力なパスワードを使う）
+  saveAdminPassword("****"); // 初回のみ実行（実際は強力なパスワードを使う）
