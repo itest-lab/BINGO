@@ -40,6 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let isAdmin = false;
   let usedNumbers = [];
   let isFlashing = false; // ランダム点滅中かどうかを判定するフラグ
+  let lastHandledUpdate = 0; // 最後に処理した更新のタイムスタンプ
   // 初回アクセスフラグを追加
   let isFirstAccess = true;
   // 秒数設定をデータベースから取得して設定
@@ -62,11 +63,12 @@ document.addEventListener("DOMContentLoaded", () => {
   firebase.database().ref("bingo/latestNumber").on("value", (snapshot) => {
     const latestNumber = snapshot.val();
 
+    numberBox.style.backgroundColor = "white"; // 白背景
+
     // 初回アクセス時はフラグを確認し、ランダム点滅をスキップ
     if (isFirstAccess) {
       if (latestNumber === null) {
         updateNumberBox("--"); // null の場合は「--」を表示
-        numberBox.style.backgroundColor = "white";
       } else {
         //numberBox.textContent(latestNumber); // 数字を表示
       }
@@ -77,12 +79,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // `latestNumber` が null の場合、表示を「--」に更新
     if (latestNumber === null) {
       updateNumberBox("--");
-      numberBox.style.backgroundColor = "white";
     } else {
       // 2回目以降の更新時にはランダム点滅を行う
-      numberBox.style.backgroundColor = "white"; // 白背景
       flashNumber(latestNumber);
-      numberBox.style.backgroundColor = "white"; // 白背景
     }
   });
 
@@ -102,11 +101,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 数字の列に応じた色を取得
   const getColumnColor = (number) => {
-    if (number <= 15) return "#add8e6"; // B (青)
-    if (number <= 30) return "#f08080"; // I (赤)
-    if (number <= 45) return "#90ee90"; // N (緑)
-    if (number <= 60) return "#ffd700"; // G (黄)
-    return "#dda0dd"; // O (紫)
+    if (number <= 15) return "#3c739c"; // B (青)
+    if (number <= 30) return "#9b3c47"; // I (赤)
+    if (number <= 45) return "#3b6338"; // N (緑)
+    if (number <= 60) return "#6d4e85"; // G (黄)
+    return "#d56f03"; // O (紫)
   };
 
   // 数字を更新して表示
@@ -132,11 +131,18 @@ document.addEventListener("DOMContentLoaded", () => {
   // リアルタイムリスナーの設定
   firebase.database().ref("bingo").on("value", (snapshot) => {
     const data = snapshot.val();
-
     if (data) {
-      // 最新の数字を表示
-      displayNumber(data.latestNumber || null);
-
+      const latestNumber = data.latestNumber || null;
+      const lastUpdated = data.lastUpdated || 0;
+  
+      // 自身が更新した場合や一定時間内の更新をスキップ
+      const now = Date.now();
+      if (lastUpdated > lastHandledUpdate && now - lastUpdated > 500) {
+        // 最新の数字を表示
+        displayNumber(latestNumber);
+        lastHandledUpdate = lastUpdated; // 最後に処理した更新を記録
+      }
+  
       // 履歴を更新
       usedNumbers = data.history || [];
       updateHistoryGrid();
@@ -149,38 +155,33 @@ document.addEventListener("DOMContentLoaded", () => {
       showAlert("すべての数字が出ました！");
       return;
     }
-
+  
     let randomNumber;
     // 過去に使用された数字を避けてランダムな数字を生成
     do {
       randomNumber = Math.floor(Math.random() * 75) + 1;
-    } while (usedNumbers.includes(randomNumber)); // 過去の数字を避ける
-
-    // データベースの latestNumber を先に更新
+    } while (usedNumbers.includes(randomNumber));
+  
+    const now = Date.now(); // 現在のタイムスタンプ
+  
+    // データベースの latestNumber と lastUpdated を更新
     firebase.database().ref("bingo").update({
       latestNumber: randomNumber,
+      lastUpdated: now, // タイムスタンプを保存
     });
-    numberBox.style.backgroundColor = "white"; // 白背景
-
-    // ランダム点滅処理
+  
+    // ランダム点滅処理を実行
     flashNumber(randomNumber, () => {
-      // **ランダム点滅終了後の処理**
-      if (!usedNumbers.includes(randomNumber)) { // 重複追加を防ぐ
-        usedNumbers.unshift(randomNumber); // 最新の数字を先頭に追加
+      if (!usedNumbers.includes(randomNumber)) {
+        usedNumbers.unshift(randomNumber);
         firebase.database().ref("bingo").update({
           history: usedNumbers,
         });
       }
-
-      // 最新の数字を表示
-      displayNumber(randomNumber);
       updateHistoryGrid();
     });
-
-    // ボタンを一時的に無効化
-    disableButtons();
   });
-
+  
   // ボタンを一時的に無効化する関数
   function disableButtons() {
     startBtn.disabled = true;
@@ -203,6 +204,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let flashInterval = setInterval(() => {
       numberBox.textContent = Math.floor(Math.random() * 75) + 1; // 点滅中にランダム数字を表示
       numberBox.style.backgroundColor = "white"; // 点滅中は白背景
+      numberBox.style.color = "black" // ランダム点滅を開始する直前に文字色を黒に設定
     }, 100);
 
     // 点滅時間終了後に停止
@@ -213,6 +215,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // 点滅終了後に最新の数字を確実に表示
       numberBox.textContent = targetNumber;
       numberBox.style.backgroundColor = getColumnColor(targetNumber); // 該当の色を設定
+      numberBox.style.color = "#fbcf87"; 
 
       // コールバック関数を呼び出し
       callback();
@@ -258,6 +261,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const displayNumber = (number) => {
     numberBox.textContent = number || "--";
     numberBox.style.backgroundColor = number ? getColumnColor(number) : "#e3e3e3";
+    numberBox.style.color = "#fbcf87"; 
   };
 
   // 過去の数字をクリックして編集ポップアップを表示
@@ -268,7 +272,6 @@ document.addEventListener("DOMContentLoaded", () => {
       numberElement.className = "history-number";
       numberElement.textContent = usedNumbers[i] || "";
       numberElement.style.backgroundColor = usedNumbers[i] ? getColumnColor(usedNumbers[i]) : "transparent";
-      numberElement.style.border = usedNumbers[i] ? "2px solid black" : "none";
       numberElement.style.width = "55px";
       numberElement.style.height = "55px";
       numberElement.style.boxShadow = usedNumbers[i] ? "0 2px 4px rgba(0, 0, 0, 0.2)" : "none";
