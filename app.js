@@ -156,8 +156,6 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
   
-    disableButtons(); // ボタンを無効化
-
     let randomNumber;
     // 過去に使用された数字を避けてランダムな数字を生成
     do {
@@ -238,8 +236,6 @@ document.addEventListener("DOMContentLoaded", () => {
       showAlert("1～75の間の数字を入力するか、すでに使用されている数字は入力できません。");
       return;
     }
-
-    disableButtons();
 
     // データベースの latestNumber を先に更新
     firebase.database().ref("bingo").update({
@@ -408,8 +404,6 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    disableButtons();
-
     updateNumber(number);
     manualPopup.style.display = "none";
   });
@@ -486,6 +480,7 @@ document.addEventListener("DOMContentLoaded", () => {
           latestNumber: newLatestNumber,
           history: usedNumbers,
         });
+        isFirstAccess = true;
       } else {
         firebase.database().ref("bingo").update({
           history: usedNumbers,
@@ -497,7 +492,6 @@ document.addEventListener("DOMContentLoaded", () => {
     editPopup.style.display = "none"; // 数字編集ポップアップを閉じる
     updateHistoryGrid();
     displayNumber(usedNumbers[0] || "--"); // 最新の数字を更新して表示
-    enableButtons();
   });
 
   // 削除確認ポップアップを閉じる
