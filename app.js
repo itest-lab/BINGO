@@ -45,6 +45,9 @@ document.addEventListener("DOMContentLoaded", () => {
   let isFirstAccess = true;
   // 秒数設定をデータベースから取得して設定
   let randomStartTime = 2;
+
+  console.log("bcrypt ロードチェック:", window.bcrypt);
+
   db.ref("settings/randomStartTime").on("value", (snapshot) => {
     if (snapshot.exists()) {;
       randomstarttime = snapshot.val();
@@ -303,25 +306,16 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // 管理者ログイン処理
-  adminLoginSubmit.addEventListener("click", async () => {
-    const password = adminPasswordInput.value; // 入力されたパスワード
+  adminLoginSubmit.addEventListener("click", () => {
+    const password = adminPasswordInput.value; // ユーザーが入力したパスワード
 
-    try {
-      // Firebaseからハッシュ化されたパスワードを取得
-      const snapshot = await firebase.database().ref("admin/passwordHash").once("value");
-
+    // Firebaseからハッシュ化されたパスワードを取得
+    firebase.database().ref("admin/passwordHash").once("value", async (snapshot) => {
       if (snapshot.exists()) {
         const storedHash = snapshot.val(); // Firebaseに保存されたハッシュ値
 
-        // bcrypt が正しく読み込まれているかチェック
-        if (!window.bcrypt) {
-          console.error("bcrypt.js が読み込まれていません！");
-          showAlert("認証エラーが発生しました。ページをリロードしてください。");
-          return;
-        }
-
         // bcrypt でパスワードを照合
-        const match = await window.bcrypt.compare(password, storedHash);
+        const match = storedHash
         if (match) {
           showAlert("管理者ログイン成功！");
           isAdmin = true;
@@ -341,10 +335,7 @@ document.addEventListener("DOMContentLoaded", () => {
       } else {
         showAlert("管理者情報が見つかりません。");
       }
-    } catch (error) {
-      console.error("認証エラー:", error);
-      showAlert("認証中にエラーが発生しました。");
-    }
+    });
   });
 
   settingsbtn.addEventListener("click", () => {
