@@ -46,6 +46,25 @@ document.addEventListener("DOMContentLoaded", () => {
   // 秒数設定をデータベースから取得して設定
   let randomStartTime = 2;
 
+  async function hashPassword(password) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(password);
+    const hash = await crypto.subtle.digest("SHA-256", data);
+    return Array.from(new Uint8Array(hash))
+      .map(b => b.toString(16).padStart(2, "0"))
+      .join("");
+  }
+  
+  // 管理者パスワードを設定（最初の1回だけ実行）
+  async function saveAdminPassword(password) {
+    const hashedPassword = await hashPassword(password);
+    firebase.database().ref("admin/password").set(hashedPassword);
+  }
+
+  /* 
+  saveAdminPassword("****"); // 初回のみ実行（実際は強力なパスワードを使う）
+  */
+
   db.ref("settings/randomStartTime").on("value", (snapshot) => {
     if (snapshot.exists()) {;
       randomstarttime = snapshot.val();
