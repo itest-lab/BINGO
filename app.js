@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let isFirstAccess = true;
   // 秒数設定をデータベースから取得して設定
   let randomStartTime = 2;
-  
+
   // エンターキーでログインを実行
   adminPasswordInput.addEventListener("keypress", (event) => {
     if (event.key === "Enter") {
@@ -111,6 +111,23 @@ document.addEventListener("DOMContentLoaded", () => {
       flashNumber(latestNumber);
     }
   });
+
+  // 実行中フラグの監視
+  db.ref("bingo/isRunning").on("value", (snapshot) => {
+    const isRunning = snapshot.val();
+    toggleButtons(!isRunning);
+  });
+
+  function setRunningState(state) {
+    db.ref("bingo/isRunning").set(state);
+  }
+
+  function toggleButtons(enable) {
+    startBtn.disabled = !enable;
+    manualBtn.disabled = !enable;
+    resetBtn.disabled = !enable;
+    settingsbtn.disabled = !enable;
+  }
 
   // アラートを表示する関数
   const showAlert = (message) => {
@@ -183,6 +200,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
   
+    setRunningState(true);
     let randomNumber;
     // 過去に使用された数字を避けてランダムな数字を生成
     do {
@@ -206,32 +224,14 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
       updateHistoryGrid();
+      setRunningState(false);
     });
   });
-  
-  // ボタンを一時的に無効化する関数
-  function disableButtons() {
-    startBtn.disabled = true;
-    manualBtn.disabled = true;
-    resetBtn.disabled = true;
-    settingsbtn.disabled = true;
-  }
-
-  // ボタンを再度有効化する関数
-  function enableButtons() {
-    startBtn.disabled = false;
-    manualBtn.disabled = false;
-    resetBtn.disabled = false;
-    settingsbtn.disabled = false;
-  }
 
   // ランダム点滅処理の関数
   function flashNumber(targetNumber, callback) {
     isFlashing = true;
-  
-    // ボタンを無効化
-    disableButtons();
-    
+      
     // ランダム点滅を開始する直前に文字色を黒に設定
     numberBox.style.color = "black";
     
@@ -251,8 +251,6 @@ document.addEventListener("DOMContentLoaded", () => {
       // コールバック関数を呼び出し
       callback();
   
-      // ボタンを再度有効化
-      enableButtons();
     }, randomStartTime * 1000);
   }
   
@@ -264,6 +262,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+    setRunningState(true);
     // データベースの latestNumber を先に更新
     firebase.database().ref("bingo").update({
       latestNumber: number,
@@ -283,6 +282,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // 最新の数字を表示
       displayNumber(number);
       updateHistoryGrid();
+      setRunningState(false);
     });
   });
   
