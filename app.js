@@ -45,6 +45,13 @@ document.addEventListener("DOMContentLoaded", () => {
   let isFirstAccess = true;
   // 秒数設定をデータベースから取得して設定
   let randomStartTime = 2;
+  
+  // エンターキーでログインを実行
+  adminPasswordInput.addEventListener("keypress", (event) => {
+    if (event.key === "Enter") {
+      adminLoginSubmit.click();
+    }
+  });
 
   async function hashPassword(password) {
     const encoder = new TextEncoder();
@@ -318,6 +325,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 管理者ログインポップアップを開く
   adminLoginBtn.addEventListener("click", () => {
+    adminPasswordInput.value = ""; // クリア
     adminPopup.style.display = "flex";
     adminPasswordInput.focus();
   });
@@ -430,8 +438,10 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // 手動入力ポップアップを開く
-  manualBtn.addEventListener("click", () => {
+    manualBtn.addEventListener("click", () => {
+    manualNumberInput.value = ""; // クリア
     manualPopup.style.display = "flex";
+    manualNumberInput.focus();
   });
 
   // 手動入力ポップアップの「OK」を押した場合
@@ -536,5 +546,4 @@ document.addEventListener("DOMContentLoaded", () => {
   cancelDeleteBtn.addEventListener("click", () => {
     deleteConfirmPopup.style.display = "none";
   });
-
 });
