@@ -201,6 +201,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   
     setRunningState(true);
+    numberBox.style.backgroundColor = "white"; // 白背景
     let randomNumber;
     // 過去に使用された数字を避けてランダムな数字を生成
     do {
@@ -234,6 +235,8 @@ document.addEventListener("DOMContentLoaded", () => {
       
     // ランダム点滅を開始する直前に文字色を黒に設定
     numberBox.style.color = "black";
+
+    numberBox.style.backgroundColor = "white"; // 白背景
     
     let flashInterval = setInterval(() => {
       numberBox.textContent = Math.floor(Math.random() * 75) + 1; // 点滅中にランダム数字を表示
