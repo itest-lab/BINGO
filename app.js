@@ -201,7 +201,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   
     setRunningState(true);
-    numberBox.style.backgroundColor = "white"; // 白背景
     let randomNumber;
     // 過去に使用された数字を避けてランダムな数字を生成
     do {
@@ -235,7 +234,6 @@ document.addEventListener("DOMContentLoaded", () => {
       
     // ランダム点滅を開始する直前に文字色を黒に設定
     numberBox.style.color = "black";
-
     numberBox.style.backgroundColor = "white"; // 白背景
     
     let flashInterval = setInterval(() => {
@@ -270,7 +268,6 @@ document.addEventListener("DOMContentLoaded", () => {
     firebase.database().ref("bingo").update({
       latestNumber: number,
     });
-    numberBox.style.backgroundColor = "white"; // 白背景
 
     // ランダム点滅処理
     flashNumber(number, () => {
