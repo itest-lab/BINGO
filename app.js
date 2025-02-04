@@ -211,24 +211,22 @@ document.addEventListener("DOMContentLoaded", () => {
     numberBox.textContent = "";
   
     // データベースの latestNumber と lastUpdated を更新
-    setTimeout(() => {
-      firebase.database().ref("bingo").update({
-        latestNumber: randomNumber,
-        lastUpdated: now, // タイムスタンプを保存
-      });
+    firebase.database().ref("bingo").update({
+      latestNumber: randomNumber,
+      lastUpdated: now, // タイムスタンプを保存
+    });
   
-      // ランダム点滅処理を実行
-      flashNumber(randomNumber, () => {
-        if (!usedNumbers.includes(randomNumber)) {
-          usedNumbers.unshift(randomNumber);
-          firebase.database().ref("bingo").update({
-            history: usedNumbers,
-          });
-        }
-        updateHistoryGrid();
-        setRunningState(false);
-      });
-    }, 1); // 0.5秒後にデータベースを更新
+    // ランダム点滅処理を実行
+    flashNumber(randomNumber, () => {
+      if (!usedNumbers.includes(randomNumber)) {
+        usedNumbers.unshift(randomNumber);
+        firebase.database().ref("bingo").update({
+          history: usedNumbers,
+        });
+      }
+      updateHistoryGrid();
+      setRunningState(false);
+    });
   });
   
   // ランダム点滅処理の関数
@@ -418,7 +416,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // 数字編集ポップアップを閉じる
   closeEditPopup.addEventListener("click", () => {
     editPopup.style.display = "none";
-
   });
 
   // アラートポップアップを閉じる
