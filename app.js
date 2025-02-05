@@ -173,24 +173,18 @@ document.addEventListener("DOMContentLoaded", () => {
   // リアルタイムリスナーの設定
   firebase.database().ref("bingo").on("value", (snapshot) => {
     const data = snapshot.val();
-    if (data) {
-      const latestNumber = data.latestNumber || null;
-      const lastUpdated = data.lastUpdated || 0;
   
-      // 自身が更新した場合や一定時間内の更新をスキップ
-      const now = Date.now();
-      if (lastUpdated > lastHandledUpdate && now - lastUpdated > 500) {
-        // 最新の数字を表示
-        displayNumber(latestNumber);
-        lastHandledUpdate = lastUpdated; // 最後に処理した更新を記録
-      }
-  
-      // 履歴を更新
-      usedNumbers = data.history || [];
-      updateHistoryGrid();
+    if (!data || data.latestNumber === null) {
+      updateNumberBox("--", "white");
+      return;
     }
-  });
   
+    const latestNumber = data.latestNumber;
+    const latestColor = data.latestNumberColor || "white"; // 色がない場合は白にする
+  
+    flashNumber(latestNumber, latestColor);
+  });
+
   // ランダムスタート
   startBtn.addEventListener("click", () => {
     if (usedNumbers.length >= 75) {
