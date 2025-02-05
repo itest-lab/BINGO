@@ -190,6 +190,11 @@ document.addEventListener("DOMContentLoaded", () => {
       updateHistoryGrid();
     }
   });
+
+  const updateNumberBox = (number, color) => {
+    numberBox.textContent = number;
+    numberBox.style.backgroundColor = color;
+  };
   
   // ランダムスタート
   startBtn.addEventListener("click", () => {
@@ -475,13 +480,12 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // 数字ボックスを更新する関数
-  updateNumberBox(content, getColumnColor(content));
+  function updateNumberBox(content) {
+    const numberBox = document.getElementById("number-box");
+    if (numberBox) {
+      numberBox.textContent = content; // 数字を更新
+    }
   }
-
-  const updateNumberBox = (number, color) => {
-    numberBox.textContent = number;
-    numberBox.style.backgroundColor = color;
-  };
 
   // Firebaseから過去の数字をリアルタイムで取得
   firebase.database().ref("bingo/history").on("value", (snapshot) => {
