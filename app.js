@@ -248,6 +248,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // 点滅終了後に最新の数字を確実に表示
       numberBox.textContent = targetNumber;
       numberBox.style.backgroundColor = getColumnColor(targetNumber); // 該当の色を設定
+      numberBox.style.color = "#fbcf87"; // 文字色を元に戻す
 
       // コールバック関数を呼び出し
       callback();
@@ -285,6 +286,8 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
 
+      numberBox.style.color = "#fbcf87"; // 文字色を元に戻す
+      
       // 最新の数字を表示
       displayNumber(number);
       updateHistoryGrid();
