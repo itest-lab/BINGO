@@ -96,6 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
         updateNumberBox("--"); // null の場合は「--」を表示
       }
       isFirstAccess = false; // フラグを切り替える
+      displayNumber(number);
       return; // 初回アクセスではランダム点滅しない
     }
 
