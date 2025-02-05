@@ -89,23 +89,22 @@ document.addEventListener("DOMContentLoaded", () => {
   // Firebaseから最新の数字をリアルタイムで取得
   firebase.database().ref("bingo/latestNumber").on("value", (snapshot) => {
     const latestNumber = snapshot.val();
-
-    // 初回アクセス時はフラグを確認し、ランダム点滅をスキップ
+  
     if (isFirstAccess) {
       if (latestNumber === null) {
-        updateNumberBox("--"); // null の場合は「--」を表示
+        updateNumberBox("--", "white"); // デフォルトの色
       }
-      isFirstAccess = false; // フラグを切り替える
-      return; // 初回アクセスではランダム点滅しない
+      isFirstAccess = false;
+      return;
     }
-
-    // `latestNumber` が null の場合、表示を「--」に更新
+  
     if (latestNumber === null) {
-      updateNumberBox("--");
-      numberBox.style.background = "white"
+      updateNumberBox("--", "white");
     } else {
-      // 2回目以降の更新時にはランダム点滅を行う
-      flashNumber(latestNumber);
+      firebase.database().ref("bingo/latestNumberColor").once("value").then((colorSnapshot) => {
+        const latestColor = colorSnapshot.val() || "white"; // デフォルトの色
+        flashNumber(latestNumber, latestColor);
+      });
     }
   });
 
@@ -151,21 +150,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 数字を更新して表示
   const updateNumber = (number) => {
-    if (isFlashing) return; // ランダム点滅中は更新しない
-
-    // 「この数字はすでに使用されています。」を回避するために
+    if (isFlashing) return;
+  
     if (usedNumbers.includes(number)) {
-      return; // 数字が過去に使われている場合は更新しない
+      return;
     }
-
-    usedNumbers.unshift(number); // 最新の数字を先頭に追加
-
+  
+    usedNumbers.unshift(number);
+  
+    const numberColor = getColumnColor(number); // 数字に対応する色を取得
+  
     firebase.database().ref("bingo").update({
       latestNumber: number,
       history: usedNumbers,
+      latestNumberColor: numberColor, // 色を保存
     });
-
-    displayNumber(number);
+  
+    displayNumber(number, numberColor);
     updateHistoryGrid();
   };
 
@@ -286,22 +287,25 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   
   // 最新の数字を表示
-  const displayNumber = (number) => {
-    // 数字を表示する前に背景色を白色に変更
+  const displayNumber = (number, color = null) => {
+    // 背景色と文字色を一時的にリセット
     numberBox.style.backgroundColor = "white";
-    numberBox.style.color = "black"; // 文字色を黒に変更
+    numberBox.style.color = "black";
     numberBox.textContent = number || "--";
-
-    if (isFlashing === true) {
+  
+    // 色が指定されていない場合、getColumnColor で取得
+    const finalColor = color || (number ? getColumnColor(number) : "#e3e3e3");
+  
+    if (isFlashing) {
       setTimeout(() => {
-        numberBox.style.backgroundColor = number ? getColumnColor(number) : "#e3e3e3";
-        numberBox.style.color = "#fbcf87"; // 点滅後に文字色を元に戻す
+        numberBox.style.backgroundColor = finalColor;
+        numberBox.style.color = "#fbcf87"; // 点滅後に文字色を変更
       }, randomStartTime * 1000);
     } else {
-      numberBox.style.backgroundColor = number ? getColumnColor(number) : "#e3e3e3";
-      numberBox.style.color = "#fbcf87"; // 文字色を元に戻す
+      numberBox.style.backgroundColor = finalColor;
+      numberBox.style.color = "#fbcf87"; // 通常時の文字色
     }
-  };  
+  };
 
   // 過去の数字をクリックして編集ポップアップを表示
   const updateHistoryGrid = () => {
@@ -471,12 +475,13 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // 数字ボックスを更新する関数
-  function updateNumberBox(content) {
-    const numberBox = document.getElementById("number-box");
-    if (numberBox) {
-      numberBox.textContent = content; // 数字を更新
-    }
+  updateNumberBox(content, getColumnColor(content));
   }
+
+  const updateNumberBox = (number, color) => {
+    numberBox.textContent = number;
+    numberBox.style.backgroundColor = color;
+  };
 
   // Firebaseから過去の数字をリアルタイムで取得
   firebase.database().ref("bingo/history").on("value", (snapshot) => {
