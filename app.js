@@ -89,22 +89,23 @@ document.addEventListener("DOMContentLoaded", () => {
   // Firebaseから最新の数字をリアルタイムで取得
   firebase.database().ref("bingo/latestNumber").on("value", (snapshot) => {
     const latestNumber = snapshot.val();
-  
+
+    // 初回アクセス時はフラグを確認し、ランダム点滅をスキップ
     if (isFirstAccess) {
       if (latestNumber === null) {
-        updateNumberBox("--", "white"); // デフォルトの色
+        updateNumberBox("--"); // null の場合は「--」を表示
       }
-      isFirstAccess = false;
-      return;
+      isFirstAccess = false; // フラグを切り替える
+      return; // 初回アクセスではランダム点滅しない
     }
-  
+
+    // `latestNumber` が null の場合、表示を「--」に更新
     if (latestNumber === null) {
-      updateNumberBox("--", "white");
+      updateNumberBox("--");
+      numberBox.style.background = "white"
     } else {
-      firebase.database().ref("bingo/latestNumberColor").once("value").then((colorSnapshot) => {
-        const latestColor = colorSnapshot.val() || "white"; // デフォルトの色
-        flashNumber(latestNumber, latestColor);
-      });
+      // 2回目以降の更新時にはランダム点滅を行う
+      flashNumber(latestNumber);
     }
   });
 
@@ -150,41 +151,45 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 数字を更新して表示
   const updateNumber = (number) => {
-    if (isFlashing) return;
-  
+    if (isFlashing) return; // ランダム点滅中は更新しない
+
+    // 「この数字はすでに使用されています。」を回避するために
     if (usedNumbers.includes(number)) {
-      return;
+      return; // 数字が過去に使われている場合は更新しない
     }
-  
-    usedNumbers.unshift(number);
-  
-    const numberColor = getColumnColor(number); // 数字に対応する色を取得
-  
+
+    usedNumbers.unshift(number); // 最新の数字を先頭に追加
+
     firebase.database().ref("bingo").update({
       latestNumber: number,
       history: usedNumbers,
-      latestNumberColor: numberColor, // 色を保存
     });
-  
-    displayNumber(number, numberColor);
+
+    displayNumber(number);
     updateHistoryGrid();
   };
 
   // リアルタイムリスナーの設定
   firebase.database().ref("bingo").on("value", (snapshot) => {
     const data = snapshot.val();
+    if (data) {
+      const latestNumber = data.latestNumber || null;
+      const lastUpdated = data.lastUpdated || 0;
   
-    if (!data || data.latestNumber === null) {
-      updateNumberBox("--", "white");
-      return;
+      // 自身が更新した場合や一定時間内の更新をスキップ
+      const now = Date.now();
+      if (lastUpdated > lastHandledUpdate && now - lastUpdated > 500) {
+        // 最新の数字を表示
+        displayNumber(latestNumber);
+        lastHandledUpdate = lastUpdated; // 最後に処理した更新を記録
+      }
+  
+      // 履歴を更新
+      usedNumbers = data.history || [];
+      updateHistoryGrid();
     }
-  
-    const latestNumber = data.latestNumber;
-    const latestColor = data.latestNumberColor || "white"; // 色がない場合は白にする
-  
-    flashNumber(latestNumber, latestColor);
   });
-
+  
   // ランダムスタート
   startBtn.addEventListener("click", () => {
     if (usedNumbers.length >= 75) {
@@ -280,39 +285,23 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
   
-  // Firebaseから色を取得する関数
-  const getColorFromFirebase = (number, callback) => {
-    const colorRef = firebase.database().ref(`colors/${number}`);
-    colorRef.once("value", (snapshot) => {
-      const color = snapshot.val();
-      callback(color || getColumnColor(number)); // データがなければデフォルトカラーを使用
-    });
-  };
-  
   // 最新の数字を表示
   const displayNumber = (number) => {
-    // 初期の背景色と文字色
+    // 数字を表示する前に背景色を白色に変更
     numberBox.style.backgroundColor = "white";
-    numberBox.style.color = "black"; 
+    numberBox.style.color = "black"; // 文字色を黒に変更
     numberBox.textContent = number || "--";
-  
-    if (number) {
-      getColorFromFirebase(number, (color) => {
-        if (isFlashing) {
-          setTimeout(() => {
-            numberBox.style.backgroundColor = color;
-            numberBox.style.color = "#fbcf87"; 
-          }, randomStartTime * 1000);
-        } else {
-          numberBox.style.backgroundColor = color;
-          numberBox.style.color = "#fbcf87"; 
-        }
-      });
+
+    if (isFlashing === true) {
+      setTimeout(() => {
+        numberBox.style.backgroundColor = number ? getColumnColor(number) : "#e3e3e3";
+        numberBox.style.color = "#fbcf87"; // 点滅後に文字色を元に戻す
+      }, randomStartTime * 1000);
     } else {
-      numberBox.style.backgroundColor = "#e3e3e3";
-      numberBox.style.color = "#fbcf87"; 
+      numberBox.style.backgroundColor = number ? getColumnColor(number) : "#e3e3e3";
+      numberBox.style.color = "#fbcf87"; // 文字色を元に戻す
     }
-  };
+  };  
 
   // 過去の数字をクリックして編集ポップアップを表示
   const updateHistoryGrid = () => {
@@ -567,6 +556,3 @@ document.addEventListener("DOMContentLoaded", () => {
     deleteConfirmPopup.style.display = "none";
   });
 });
-
-
-numberBox の色の管理をfirebaseできますか？
