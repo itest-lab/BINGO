@@ -103,9 +103,10 @@ document.addEventListener("DOMContentLoaded", () => {
     // `latestNumber` が null の場合、表示を「--」に更新
     if (latestNumber === null) {
       updateNumberBox("--");
-      numberBox.style.background = "white"
     } else {
       // 2回目以降の更新時にはランダム点滅を行う
+      numberBox.style.background = "white"
+      numberBox.style.color = "black"; // 文字色を黒に変更
       flashNumber(latestNumber);
     }
   });
