@@ -180,7 +180,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const now = Date.now();
       if (lastUpdated > lastHandledUpdate && now - lastUpdated > 500) {
         // 最新の数字を表示
-        displayNumber(latestNumber);
+        // displayNumber(latestNumber);
         lastHandledUpdate = lastUpdated; // 最後に処理した更新を記録
       }
   
@@ -198,7 +198,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   
     setRunningState(true);
-  
+    
+    numberBox.style.backgroundColor = "white";
+    numberBox.style.color = "black"; // 文字色を黒に変更
+    
     let randomNumber;
     // 過去に使用された数字を避けてランダムな数字を生成
     do {
@@ -262,7 +265,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     setRunningState(true);
-
+  
+    numberBox.style.backgroundColor = "white";
+    numberBox.style.color = "black"; // 文字色を黒に変更
+    
     // データベースの latestNumber を先に更新
     firebase.database().ref("bingo").update({
       latestNumber: number,
@@ -287,20 +293,9 @@ document.addEventListener("DOMContentLoaded", () => {
   
   // 最新の数字を表示
   const displayNumber = (number) => {
-    // 数字を表示する前に背景色を白色に変更
-    numberBox.style.backgroundColor = "white";
-    numberBox.style.color = "black"; // 文字色を黒に変更
     numberBox.textContent = number || "--";
-
-    if (isFlashing === true) {
-      setTimeout(() => {
-        numberBox.style.backgroundColor = number ? getColumnColor(number) : "#e3e3e3";
-        numberBox.style.color = "#fbcf87"; // 点滅後に文字色を元に戻す
-      }, randomStartTime * 1000);
-    } else {
-      numberBox.style.backgroundColor = number ? getColumnColor(number) : "#e3e3e3";
-      numberBox.style.color = "#fbcf87"; // 文字色を元に戻す
-    }
+    numberBox.style.backgroundColor = number ? getColumnColor(number) : "#e3e3e3";
+    numberBox.style.color = "#fbcf87"; // 文字色を元に戻す
   };  
 
   // 過去の数字をクリックして編集ポップアップを表示
