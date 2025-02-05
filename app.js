@@ -190,11 +190,6 @@ document.addEventListener("DOMContentLoaded", () => {
       updateHistoryGrid();
     }
   });
-
-  const updateNumberBox = (number, color) => {
-    numberBox.textContent = number;
-    numberBox.style.backgroundColor = color;
-  };
   
   // ランダムスタート
   startBtn.addEventListener("click", () => {
@@ -292,25 +287,22 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   
   // 最新の数字を表示
-  const displayNumber = (number, color = null) => {
-    // 背景色と文字色を一時的にリセット
+  const displayNumber = (number) => {
+    // 数字を表示する前に背景色を白色に変更
     numberBox.style.backgroundColor = "white";
-    numberBox.style.color = "black";
+    numberBox.style.color = "black"; // 文字色を黒に変更
     numberBox.textContent = number || "--";
-  
-    // 色が指定されていない場合、getColumnColor で取得
-    const finalColor = color || (number ? getColumnColor(number) : "#e3e3e3");
-  
-    if (isFlashing) {
+
+    if (isFlashing === true) {
       setTimeout(() => {
-        numberBox.style.backgroundColor = finalColor;
-        numberBox.style.color = "#fbcf87"; // 点滅後に文字色を変更
+        numberBox.style.backgroundColor = number ? getColumnColor(number) : "#e3e3e3";
+        numberBox.style.color = "#fbcf87"; // 点滅後に文字色を元に戻す
       }, randomStartTime * 1000);
     } else {
-      numberBox.style.backgroundColor = finalColor;
-      numberBox.style.color = "#fbcf87"; // 通常時の文字色
+      numberBox.style.backgroundColor = number ? getColumnColor(number) : "#e3e3e3";
+      numberBox.style.color = "#fbcf87"; // 文字色を元に戻す
     }
-  };
+  };  
 
   // 過去の数字をクリックして編集ポップアップを表示
   const updateHistoryGrid = () => {
@@ -565,3 +557,6 @@ document.addEventListener("DOMContentLoaded", () => {
     deleteConfirmPopup.style.display = "none";
   });
 });
+
+
+numberBox の色の管理をfirebaseできますか？
