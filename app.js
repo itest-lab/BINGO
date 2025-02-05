@@ -286,23 +286,39 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
   
+  // Firebaseから色を取得する関数
+  const getColorFromFirebase = (number, callback) => {
+    const colorRef = firebase.database().ref(`colors/${number}`);
+    colorRef.once("value", (snapshot) => {
+      const color = snapshot.val();
+      callback(color || getColumnColor(number)); // データがなければデフォルトカラーを使用
+    });
+  };
+  
   // 最新の数字を表示
   const displayNumber = (number) => {
-    // 数字を表示する前に背景色を白色に変更
+    // 初期の背景色と文字色
     numberBox.style.backgroundColor = "white";
-    numberBox.style.color = "black"; // 文字色を黒に変更
+    numberBox.style.color = "black"; 
     numberBox.textContent = number || "--";
-
-    if (isFlashing === true) {
-      setTimeout(() => {
-        numberBox.style.backgroundColor = number ? getColumnColor(number) : "#e3e3e3";
-        numberBox.style.color = "#fbcf87"; // 点滅後に文字色を元に戻す
-      }, randomStartTime * 1000);
+  
+    if (number) {
+      getColorFromFirebase(number, (color) => {
+        if (isFlashing) {
+          setTimeout(() => {
+            numberBox.style.backgroundColor = color;
+            numberBox.style.color = "#fbcf87"; 
+          }, randomStartTime * 1000);
+        } else {
+          numberBox.style.backgroundColor = color;
+          numberBox.style.color = "#fbcf87"; 
+        }
+      });
     } else {
-      numberBox.style.backgroundColor = number ? getColumnColor(number) : "#e3e3e3";
-      numberBox.style.color = "#fbcf87"; // 文字色を元に戻す
+      numberBox.style.backgroundColor = "#e3e3e3";
+      numberBox.style.color = "#fbcf87"; 
     }
-  };  
+  };
 
   // 過去の数字をクリックして編集ポップアップを表示
   const updateHistoryGrid = () => {
