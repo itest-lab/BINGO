@@ -205,7 +205,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
     setRunningState(true);
     
-    numberBox.style.backgroundColor = "white";
+    numberBox.style.background = "white";
     numberBox.style.color = "black"; // 文字色を黒に変更
     
     let randomNumber;
@@ -252,7 +252,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // 点滅終了後に最新の数字を確実に表示
       numberBox.textContent = targetNumber;
-      numberBox.style.backgroundColor = getColumnColor(targetNumber); // 該当の色を設定
+      numberBox.style.background = getColumnColor(targetNumber); // 該当の色を設定
       numberBox.style.color = "#fbcf87"; // 文字色を元に戻す
 
       // コールバック関数を呼び出し
@@ -273,7 +273,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     setRunningState(true);
   
-    numberBox.style.backgroundColor = "white";
+    numberBox.style.background = "white";
     numberBox.style.color = "black"; // 文字色を黒に変更
     
     // データベースの latestNumber を先に更新
@@ -303,7 +303,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // 最新の数字を表示
   const displayNumber = (number) => {
     numberBox.textContent = number || "--";
-    numberBox.style.backgroundColor = number ? getColumnColor(number) : "#e3e3e3";
+    numberBox.style.background = number ? getColumnColor(number) : "whirt";
     numberBox.style.color = "#fbcf87"; // 文字色を元に戻す
   };  
 
