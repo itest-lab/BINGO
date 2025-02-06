@@ -95,7 +95,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (latestNumber === null) {
         updateNumberBox("--"); // null の場合は「--」を表示
         numberBox.style.background = "white"
-        numberBox.style.color = "black";
+        numberBox.style.color = "#fbcf87";
       }
       isFirstAccess = false; // フラグを切り替える
       displayNumber(latestNumber);
@@ -106,7 +106,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (latestNumber === null) {
       updateNumberBox("--");
       numberBox.style.background = "white"
-      numberBox.style.color = "black";
+      numberBox.style.color = "#fbcf87";
     } else {
       // 2回目以降の更新時にはランダム点滅を行う
       numberBox.style.background = "white"
