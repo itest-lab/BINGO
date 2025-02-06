@@ -303,7 +303,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // 最新の数字を表示
   const displayNumber = (number) => {
     numberBox.textContent = number || "--";
-    numberBox.style.background = number ? getColumnColor(number) : "whirt";
+    numberBox.style.background = number ? getColumnColor(number) : "white";
     numberBox.style.color = "#fbcf87"; // 文字色を元に戻す
   };  
 
