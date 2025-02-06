@@ -94,8 +94,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (isFirstAccess) {
       if (latestNumber === null) {
         updateNumberBox("--"); // null の場合は「--」を表示
-        numberBox.style.color = #fbcf87;
         numberBox.style.background = "white"
+        numberBox.style.color = "black";
       }
       isFirstAccess = false; // フラグを切り替える
       displayNumber(latestNumber);
@@ -106,7 +106,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (latestNumber === null) {
       updateNumberBox("--");
       numberBox.style.background = "white"
-      numberBox.style.color = #fbcf87;
+      numberBox.style.color = "black";
     } else {
       // 2回目以降の更新時にはランダム点滅を行う
       numberBox.style.background = "white"
@@ -303,7 +303,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // 最新の数字を表示
   const displayNumber = (number) => {
     numberBox.textContent = number || "--";
-    numberBox.style.backgroundColor = number ? getColumnColor(number) : "#e3e3e3";
+    numberBox.style.backgroundColor = number ? getColumnColor(number) : "white";
     numberBox.style.color = "#fbcf87"; // 文字色を元に戻す
   };  
 
